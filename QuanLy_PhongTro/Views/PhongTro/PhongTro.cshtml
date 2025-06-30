@@ -1,0 +1,179 @@
+﻿@model IEnumerable<IGrouping<LoaiPhongModel, PhongTroModel>>
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng trọ và Nguyên căn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="@Url.Content("~/css/sitePhongTro.css")">
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="toast-container" class="toast-container"></div>
+    <div class="filter-container">
+        <!-- Bộ lọc Loại phòng -->
+        <div class="filter-item">
+            <button class="filter-btn" onclick="toggleDropdown('roomTypeDropdown')">
+                <span class="filter-text">Loại phòng</span>
+                <i class="fas fa-caret-down"></i>
+            </button>
+            <div class="filter-dropdown" id="roomTypeDropdown">
+                <vc:loai-phongs></vc:loai-phongs>
+                <div class="filter-actions">
+                    <button class="filter-reset" onclick="resetSelection('roomType')">Đặt lại</button>
+                    <button class="filter-apply" onclick="applySelection('roomType')">Áp dụng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ lọc Tiện nghi -->
+        <div class="filter-item">
+            <button class="filter-btn" onclick="toggleDropdown('amenitiesDropdown')">
+                <span class="filter-text">Tiện nghi</span>
+                <i class="fas fa-caret-down"></i>
+            </button>
+            <div class="filter-dropdown" id="amenitiesDropdown">
+                <vc:thiet-bis></vc:thiet-bis>
+                <div class="filter-actions">
+                    <button class="filter-reset" onclick="resetSelection('amenities')">Đặt lại</button>
+                    <button class="filter-apply" onclick="applySelection('amenities')">Áp dụng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ lọc Mức giá -->
+        <div class="filter-item">
+            <button class="filter-btn" onclick="toggleDropdown('priceDropdown')">
+                <span class="filter-text">Mức giá</span>
+                <i class="fas fa-caret-down"></i>
+            </button>
+            <div class="filter-dropdown" id="priceDropdown">
+                <label class="filter-option"><input type="radio" name="price" value="under-2"> Dưới 2 triệu</label>
+                <label class="filter-option"><input type="radio" name="price" value="2-3"> 2 - 3 triệu</label>
+                <label class="filter-option"><input type="radio" name="price" value="3-5"> 3 - 5 triệu</label>
+                <label class="filter-option"><input type="radio" name="price" value="5-7"> 5 - 7 triệu</label>
+                <label class="filter-option"><input type="radio" name="price" value="over"> Trên 7 triệu</label>
+                <div class="filter-actions">
+                    <button class="filter-reset" onclick="resetSelection('price')">Đặt lại</button>
+                    <button class="filter-apply" onclick="applySelection('price')">Áp dụng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ lọc Diện tích -->
+        <div class="filter-item">
+            <button class="filter-btn" onclick="toggleDropdown('areaDropdown')">
+                <span class="filter-text">Diện tích</span>
+                <i class="fas fa-caret-down"></i>
+            </button>
+            <div class="filter-dropdown" id="areaDropdown">
+                <label class="filter-option"><input type="radio" name="area" value="under-20"> Dưới 20m²</label>
+                <label class="filter-option"><input type="radio" name="area" value="20-30"> 20 - 30m²</label>
+                <label class="filter-option"><input type="radio" name="area" value="30-50"> 30 - 50m²</label>
+                <label class="filter-option"><input type="radio" name="area" value="over-50"> Trên 50m²</label>
+                <div class="filter-actions">
+                    <button class="filter-reset" onclick="resetSelection('area')">Đặt lại</button>
+                    <button class="filter-apply" onclick="applySelection('area')">Áp dụng</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút Tìm kiếm -->
+        <button class="search-btn" onclick="fetchFilteredRooms()">Tìm kiếm</button>
+    </div>
+
+    <div class="info-select">
+        <div class="separator"></div>
+        <div class="filter-container">
+            <div class="filter-title" id="filter-title">Tìm thấy xxx kết quả</div>
+            <div class="sort-box">
+                <select class="sort-select" id="sort-options">
+                    <option value="default-sort">Chọn lọc</option>
+                    <option value="price-des">Giá cao đến thấp</option>
+                    <option value="price-asc">Giá thấp đến cao</option>
+                    <option value="area-des">Diện tích lớn đến nhỏ</option>
+                    <option value="area-asc">Diện tích bé đến lớn</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="container show-all">
+        @foreach (var nhom in Model)
+        {
+            <div class="building-section">
+                <div class="building-info">
+                    <h1>@nhom.Key.TenLoaiPhong</h1>
+                </div>
+
+                <div class="room-list">
+                    @foreach (var item in nhom)
+                    {
+                        <div class="room-card" data-room-id="@item.MaPhong">
+                            <div class="room-save-icon" data-room-id="@item.MaPhong">
+                                <i class="@(ViewData[$"IsSaved_{item.MaPhong}"] as bool? == true ? "fas" : "far") fa-bookmark" id="save-icon-@item.MaPhong"></i>
+                            </div>
+
+                            @if (item.AnhPhongTros != null && item.AnhPhongTros.Any(a => a.LaAnhDaiDien))
+                            {
+                                <img src="@Url.Content("~/asset/" + item.AnhPhongTros.First(a => a.LaAnhDaiDien).DuongDan)" alt="@item.TenPhong" class="room-image">
+                            }
+                            else
+                            {
+                                <img src="@Url.Content("~/asset/default-room.jpg")" alt="@item.TenPhong" class="room-image">
+                            }
+
+                            <div class="room-content">
+                                <div class="room-header">
+                                    <h2>@item.TenPhong - @item.DiaChi</h2>
+                                </div>
+                                <div class="room-price-area">
+                                    <span class="price">@item.GiaThue.ToString("N0") VNĐ</span>
+                                    <span class="area">@item.DienTich m²</span>
+                                </div>
+                                <div class="room-features">
+                                    @if (item.MaLoaiPhong == 1)
+                                    {
+                                        <span><i class="fas fa-home"></i> Phòng trọ</span>
+                                    }
+                                    else
+                                    {
+                                        <span><i class="fas fa-building"></i> Nguyên căn</span>
+                                    }
+
+                                    @if (item.PhongTroThietBis != null)
+                                    {
+                                        @foreach (var tb in item.PhongTroThietBis.Take(3))
+                                        {
+                                            <span><i class="fas fa-check"></i> @tb.ThietBi?.TenThietBi</span>
+                                        }
+                                    }
+                                </div>
+                                <div class="room-divider"></div>
+                                <div class="room-poster">
+                                    <span class="poster-name">Quản lý</span>
+                                    <span class="room-status @(item.TrangThai?.Trim().ToLower() == "còn trống" ? "available" : "rented")">
+                                        @item.TrangThai
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Phân trang cho từng loại phòng -->
+                <nav aria-label="Room pagination" class="pagination-container">
+                    <ul class="pagination justify-content-center" data-loai-phong="@nhom.Key.MaLoaiPhong">
+                        <!-- Phân trang sẽ được tạo động bằng JavaScript -->
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+    <script src="@Url.Content("~/js/sitePhongTro.js")"></script>
+</body>
+</html>

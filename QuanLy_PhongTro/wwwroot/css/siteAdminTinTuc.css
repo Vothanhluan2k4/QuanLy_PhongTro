@@ -1,0 +1,22 @@
+﻿.news-section {
+    padding: 20px;
+}
+
+.news-list table {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.news-list img {
+    max-height: 100px;
+    object-fit: cover;
+}
+
+#news-modal .modal-content {
+    width: 600px;
+}
+
+#news-image-preview img {
+    max-width: 200px;
+    margin-top: 10px;
+}

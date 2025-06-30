@@ -1,0 +1,1219 @@
+﻿@model QuanLy_PhongTro.ViewModel.PhongTroNguoiDungViewModel
+@using System.Linq
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Quản lý phòng trọ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/siteAdmin.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+</head>
+<body>  
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2>Admin Panel</h2>
+            </div>
+            <ul class="menu">
+                <li class="active">
+                    <a href="#" data-section="room-list-section">
+                        <i class="fas fa-door-open"></i>
+                        <span>Quản lý phòng</span>
+                    </a>
+                    <ul class="submenu">
+                        <li>
+                            <a href="#" class="submenu-link active" data-section="room-list-section">Danh sách phòng</a>
+                        </li>
+                        <li>
+                            <a href="#" class="submenu-link" data-section="room-type-section">Quản lý loại phòng</a>
+                        </li>
+                        <li>
+                            <a href="#" class="submenu-link" data-section="equipment-section">Quản lý thiết bị</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" data-section="user-section">
+                        <i class="fas fa-users"></i>
+                        <span>Quản lý người dùng</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="settings-section">
+                        <i class="fa-regular fa-address-book"></i>
+                        <span>Quản lý Hợp đồng</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="invoice-section">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Quản lý Hóa đơn</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="issues-section">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Báo cáo sự cố</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="news-section">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <span>Tin Tức</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-section="revenue-section">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Doanh Thu</span>
+                    </a>
+                </li>
+                <li>
+                    <a asp-area="Views" asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Thoát</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+   
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="header">
+                <div class="header-title">
+                    <h1>Quản lý phòng trọ</h1>
+                </div>
+                <div class="user-info">
+                    <img src="~/asset/avatar.png" alt="User">
+                    <span>Admin</span>
+                </div>
+            </header>
+
+            <div class="content">
+
+                
+
+                <!-- Danh sách phòng -->
+                <div class="room-list-section section-active">
+                    <div class="action-bar">
+                        <button id="btn-add-room" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Thêm phòng mới
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="search-room-input" placeholder="Nhập tên phòng hoặc loại phòng">
+                            <button id="search-room-btn"><i class="fas fa-search"></i></button>
+                            <button id="reset-search-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="room-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">ID Phòng</th>
+                                    <th scope="col">Loại Phòng</th>
+                                    <th scope="col">Tên Phòng</th>
+                                    <th scope="col">Địa Chỉ</th>
+                                    <th scope="col">Thiết bị</th>
+                                    <th scope="col">Diện tích</th>
+                                    <th scope="col">Tiền điện</th>
+                                    <th scope="col">Tiền nước</th>
+                                    <th scope="col">Giá thuê</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Hình đại diện</th>
+                                    <th scope="col">Mô tả</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.PhongTros != null && Model.PhongTros.Any())
+                                {
+                                    int stt = 1;
+                                    @foreach (var item in Model.PhongTros)
+                                    {
+                                        <tr>
+                                            <td>@stt</td>
+                                            <td>@item.MaPhong</td>
+                                            <td>@(item.LoaiPhong?.TenLoaiPhong ?? "Không xác định")</td>
+                                            <td>@(item.TenPhong ?? "Không có tên")</td>
+                                            <td>@(item.DiaChi ?? "Không có địa chỉ")</td>
+                                            <td>
+                                                <ul class="thiet-bi-list">
+                                                    @if (item.PhongTroThietBis != null && item.PhongTroThietBis.Any())
+                                                    {
+                                                        @foreach (var thietBi in item.PhongTroThietBis)
+                                                        {
+                                                            <li>@(thietBi.ThietBi?.TenThietBi ?? "Không xác định") (Số lượng: @thietBi.SoLuong)</li>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <li>Không có thiết bị</li>
+                                                    }
+                                                </ul>
+                                            </td>
+                                            <td>@(item.DienTich)</td>
+                                            <td>@(item.TienDien.ToString("N0"))</td>
+                                            <td>@(item.TienNuoc.ToString("N0"))</td>
+                                            <td>@(item.GiaThue.ToString("N0"))</td>
+                                            <td>@(item.TrangThai ?? "Không xác định")</td>
+                                            <td>
+                                                @if (item.AnhPhongTros != null && item.AnhPhongTros.Any(a => a.LaAnhDaiDien))
+                                                {
+                                                    var anhDaiDien = item.AnhPhongTros.FirstOrDefault(a => a.LaAnhDaiDien);
+                                                    <img src="@Url.Content("~/asset/" + anhDaiDien.DuongDan)" alt="Hình đại diện" class="anh-dai-dien" />
+                                                }
+                                                else
+                                                {
+                                                    <span>Không có ảnh</span>
+                                                }
+                                            </td>
+                                            <td>@(item.MoTa ?? "Không có mô tả")</td>
+                                            <td>
+                                                <button type="button" class="btn btn-warning btn-sm btn-update-room" data-id="@item.MaPhong">Sửa</button>
+                                                <button type="button" class="btn btn-danger btn-sm btn-delete-room" data-id="@item.MaPhong">Xóa</button>
+                                            </td>
+                                        </tr>
+                                        stt++;
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="13" class="text-center">Không có phòng trọ nào để hiển thị.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="pagination-container">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item" id="prev-page"><a class="page-link" href="#">Previous</a></li>
+                                    <!-- Các trang sẽ được tạo động bằng JS -->
+                                    <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                            </nav>
+                            <div class="total-count"> <span id="total-room-count"></span> bản ghi (<span id="room-items-per-page">5</span>/trang)</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Quản lý loại phòng -->
+                <div class="room-type-section">
+                    <div class="action-bar">
+                        <button id="btn-add-room-type" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Thêm loại phòng
+                        </button>
+                    </div>
+
+                    <div class="room-type-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Mã loại phòng</th>
+                                    <th scope="col">Tên loại Phòng</th>
+                                    <th scope="col">Mô tả</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="room-type-list-body">
+                                <!-- Danh sách loại phòng sẽ được tải động bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quản lý thiết bị -->
+                <div class="equipment-section">
+                    <div class="action-bar">
+                        <button id="btn-add-equipment" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Thêm thiết bị
+                        </button>
+                    </div>
+
+                    <div class="equipment-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Mã thiết bị</th>
+                                    <th scope="col">Tên thiết Bị</th>
+                                    <th scope="col">Mô tả</th>
+                                    <th scope="col">Trình trạng</th>
+                                    <th scope="col">Đơn vị</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="equipment-list-body">
+                                <!-- Danh sách thiết bị sẽ được tải động bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quản lý người dùng -->
+                <div class="user-section">
+                    <div class="action-bar">
+                        <button id="btn-add-user" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Thêm người dùng mới
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="search-user-input" placeholder="Tìm kiếm theo tên hoặc email...">
+                            <button id="search-user-btn"><i class="fas fa-search"></i></button>
+                            <button id="reset-user-search-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="user-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">ID Người dùng</th>
+                                    <th scope="col">Họ tên</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Số điện thoại</th>
+                                    <th scope="col">Quyền</th>
+                                    <th scope="col">Ngày tạo</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-list-body">
+                                @if (Model.NguoiDungs != null && Model.NguoiDungs.Any())
+                                {
+                                    int stt = 1;
+                                    @foreach (var item in Model.NguoiDungs)
+                                    {
+                                        <tr>
+                                            <td>@stt</td>
+                                            <td>@item.MaNguoiDung</td>
+                                            <td>@item.HoTen</td>
+                                            <td>@item.Email</td>
+                                            <td>@item.SoDienThoai</td>
+                                            <td>@(item.PhanQuyen?.TenQuyen ?? "Chưa xác định")</td>
+                                            <td>@item.NgayTao.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td>@(item.IsDeleted ? "Ngừng hoạt động" : "Hoạt động")</td>
+                                            <td>
+                                                <button type="button" class="btn btn-warning btn-sm btn-update-user" data-id="@item.MaNguoiDung">
+                                                    <i class="fas fa-edit"></i> Sửa
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm btn-delete-user" data-id="@item.MaNguoiDung">
+                                                    <i class="fas fa-trash-alt"></i> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        stt++;
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="13" class="text-center">Không có người dùng nào để hiển thị.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div class="pagination-container">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item" id="prev-page"><a class="page-link" href="#">Previous</a></li>
+                                    <!-- Các trang sẽ được tạo động bằng JS -->
+                                    <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                            </nav>
+                            <div class="total-count">Tổng: <span id="total-user-count"></span> bản ghi (<span id="user-items-per-page">10</span>/trang)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal thêm/sửa người dùng -->
+                <div id="user-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="user-modal-title">Thêm người dùng mới</h2>
+                            <span class="close">×</span>
+                        </div>
+                        <div class="modal-body">
+                            <form id="user-form" method="post">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group">
+                                    <label for="user-fullname">Họ tên</label>
+                                    <input type="text" id="user-fullname" name="HoTen" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user-email">Email</label>
+                                    <input type="email" id="user-email" name="Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user-phone">Số điện thoại</label>
+                                    <input type="text" id="user-phone" name="SoDienThoai" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user-password">Mật khẩu</label>
+                                    <input type="password" id="user-password" name="MatKhau" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user-role">Quyền</label>
+                                    <select id="user-role" name="MaQuyen" required>
+                                        <option value="">Chọn quyền</option>
+                                        @if (Model.PhanQuyens != null && Model.PhanQuyens.Any())
+                                        {
+                                            @foreach (var item in Model.PhanQuyens)
+                                            {
+                                                <option value="@item.MaQuyen"> @item.TenQuyen</option>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p>Không có dữ liệu loại phòng.</p>
+                                        }
+                                        
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user-status">Trạng thái</label>
+                                    <select id="user-status" name="IsDeleted">
+                                        <option value="false">Hoạt động</option>
+                                        <option value="true">Ngừng hoạt động</option>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" id="user-btn-cancel">Hủy</button>
+                                        <button type="submit" class="btn btn-primary">Lưu</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quản lý hợp đồng -->
+                <div class="settings-section">
+                    <div class="action-bar">
+                        <button id="btn-add-hopdong" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Thêm hợp đồng mới
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="search-hopdong-input" placeholder="Tìm kiếm theo mã hợp đồng, tên người dùng...">
+                            <button id="search-hopdong-btn"><i class="fas fa-search"></i></button>
+                            <button id="reset-hopdong-search-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="hopdong-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Mã Hợp Đồng</th>
+                                    <th scope="col">Mã Phòng</th>
+                                    <th scope="col">Tên Phòng</th>
+                                    <th scope="col">Tên Người Dùng</th>
+                                    <th scope="col">Ngày Bắt Đầu</th>
+                                    <th scope="col">Ngày Kết Thúc</th>
+                                    <th scope="col">Tiền Cọc (VNĐ)</th>
+                                    <th scope="col">Trạng Thái</th>
+                                    <th scope="col">Thanh toán</th>
+                                    <th scope="col">Ngày Ký</th>
+                                    <th scope="col">Ghi Chú</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hopdong-list-body">   
+                            </tbody>
+                        </table>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center" id="pagination">
+                                <!-- Các nút phân trang sẽ được tạo động -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <!-- Hóa đơn -->
+                <div class="invoice-section">
+                    
+                        <div class="action-bar">
+                        <button id="btn-add-hoadon" class="btn btn-primary" onclick="openAddHoaDonModal()">
+                                <i class="fas fa-plus"></i> Thêm hóa đơn mới
+                            </button>
+                            <div class="search-box">
+                                <input type="text" id="search-hoadon-input" placeholder="Tìm kiếm theo mã hóa đơn, mã hợp đồng...">
+                                <button id="search-hoadon-btn"><i class="fas fa-search"></i></button>
+                                <button id="reset-hoadon-search-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="hoadon-list">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">STT</th>
+                                        <th scope="col">Mã Hóa Đơn</th>
+                                        <th scope="col">Mã Hợp Đồng</th>
+                                        <th scope="col">Tháng</th>
+                                        <th scope="col">Năm</th>
+                                        <th scope="col">Tiền Điện</th>
+                                        <th scope="col">Tiền Nước</th>
+                                        <th scope="col">Tiền Rác</th>
+                                        <th scope="col">Tổng Tiền</th>
+                                        <th scope="col">Ngày Tạo</th>
+                                        <th scope="col">Trạng Thái</th>
+                                        <th scope="col">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hoadon-list-body">
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                     
+                </div>
+                <div class="revenue-section">
+                    <div class="action-barDT">
+                        <div class="filter-box">
+                            <div class="date-wrapper">
+                                <label for="start-date" class="date-label">Từ ngày</label>
+                                <input type="date" class="date-input" id="start-date" name="start-date" />
+                            </div>
+                            <div class="date-wrapper">
+                                <label for="end-date" class="date-label">Đến ngày</label>
+                                <input type="date" class="date-input" id="end-date" name="end-date" />
+                            </div>
+                            <div class="date-select">
+                                <button type="button" id="1monthAgo" class="date-button">1 tháng trước</button>
+                                <button type="button" id="1yearAgo" class="date-button">1 năm trước</button>
+                            </div>
+                            <select class="filter-select" id="revenue-method">
+                                <option value="revenue-booking">Doanh thu hợp đồng</option>
+                                <option value="revenue-receipt">Doanh thu hóa đơn</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="show-revenue">
+                        <div class="revenue-item">
+                            <span class="revenue-label">Tổng khách hàng</span>
+                            <input type="text" class="revenue-input" id="total-customers" value="@(Model.Revenue != null ? Model.Revenue.TotalCustomers : 0)" readonly>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">Tổng phòng</span>
+                            <input type="text" class="revenue-input" id="total-rooms" value="@(Model.Revenue != null ? Model.Revenue.TotalRooms : 0)" readonly>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">Tổng hợp đồng</span>
+                            <input type="text" class="revenue-input" id="total-contracts" value="@(Model.Revenue != null ? Model.Revenue.TotalContracts : 0)" readonly>
+                        </div>
+                    </div>
+                    <div class="charts-container">
+                        <div class="revenue-column full-width">
+                            <h3>Doanh thu theo thời gian</h3>
+                            <canvas id="column-data" ></canvas>
+                        </div>
+                        <div class="revenue-pie-chart">
+                            <h3>Phân bố hợp đồng theo loại phòng</h3>
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+               <!-- Báo cáo sự cố -->
+                <div class="issues-section">
+                    <h2>Báo cáo sự cố</h2>
+
+                    <!-- Action Bar with Search -->
+                    <div class="action-barIssues mb-3">
+                        <div class="search-box">
+                            <input type="text" id="search-issues-input" placeholder="Tìm kiếm theo tên phòng, loại sự cố...">
+                            <button id="search-issues-btn"><i class="fas fa-search"></i> Tìm kiếm</button>
+                            <button id="reset-issues-search-btn" style="display: none;"><i class="fas fa-times"></i> Xóa</button>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Filter -->
+                    <div class="filter-nav mb-3">
+                        <label>Lọc theo thời gian:</label>
+                        <div class="btn-group mx-2">
+                            <button id="sort-latest" class="btn btn-outline-primary active" data-sort="latest">Gần nhất</button>
+                            <button id="sort-earliest" class="btn btn-outline-primary" data-sort="earliest">Xa nhất</button>
+                        </div>
+
+                        <label>Lọc theo trạng thái:</label>
+                        <div class="btn-group mx-2">
+                            <button id="filter-all" class="btn btn-outline-primary active" data-filter="all">Tất cả</button>
+                            <button id="filter-unresolved" class="btn btn-outline-primary" data-filter="unresolved">Chưa xử lý</button>
+                            <button id="filter-resolved" class="btn btn-outline-primary" data-filter="resolved">Đã xử lý</button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="issues-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Tên Phòng</th>
+                                    <th scope="col">Người Báo Cáo</th>
+                                    <th scope="col">Loại Sự Cố</th>
+                                    <th scope="col">Mô Tả</th>
+                                    <th scope="col">Mức Độ</th>
+                                    <th scope="col">Trạng Thái</th>
+                                    <th scope="col">Ngày Tạo</th>
+                                    <th scope="col">Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="issues-list-body">
+                                <!-- Data will be dynamically loaded here -->
+                                <tr>
+                                    <td colspan="9" class="text-center">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Modal xem media -->
+                    <div id="media-modal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2>Xem Media</h2>
+                                <span class="close">&times;</span>
+                            </div>
+                            <div class="modal-body">
+                                <div id="media-container">
+                                    <!-- Media sẽ được tải động -->
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" id="media-btn-cancel">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal cập nhật trạng thái -->
+                    <div id="update-issue-modal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 id="update-issue-modal-title">Cập nhật trạng thái sự cố</h2>
+                                <span class="close">&times;</span>
+                            </div>
+                            <div class="modal-body">
+                                <form id="update-issue-form" method="post">
+                                    <input type="hidden" id="update-issue-id" name="Id" />
+                                    <div class="form-group">
+                                        <label for="update-issue-status">Trạng thái</label>
+                                        <select id="update-issue-status" name="TrangThai" class="form-control" required>    
+                                            <option value="Chưa xử lý">Chưa xử lý</option>
+                                            <option value="Đã xử lý">Đã xử lý</option>
+                                        </select>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div class="form-actions">
+                                            <button type="button" class="btn btn-secondary" id="update-issue-btn-cancel">Hủy</button>
+                                            <button type="submit" class="btn btn-primary" id="update-issue-btn-save">Lưu</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-section">
+                    <div class="action-bar">
+                        <button id="btn-add-news" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Thêm tin tức mới
+                        </button>
+                        <div class="search-box">
+                            <input type="text" id="search-news-input" placeholder="Tìm kiếm theo tiêu đề hoặc loại tin tức...">
+                            <button id="search-news-btn"><i class="fas fa-search"></i></button>
+                            <button id="reset-news-search-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="news-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Mã Tin Tức</th>
+                                    <th scope="col">Tiêu Đề</th>
+                                    <th scope="col">Loại Tin Tức</th>
+                                    <th scope="col">Người Đăng</th>
+                                    <th scope="col">Ngày Đăng</th>
+                                    <th scope="col">Lượt Xem</th>
+                                    <th scope="col">Hình Ảnh</th>
+                                    <th scope="col">Mô Tả</th>
+                                    <th scope="col">Hành Động</th>
+                                </tr>
+                            </thead>
+                            <tbody id="news-list-body">
+                                <!-- Data will be dynamically loaded here -->
+                                <tr>
+                                    <td colspan="10" class="text-center">Đang tải dữ liệu...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination-container">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <li class="page-item" id="news-prev-page"><a class="page-link" href="#">Previous</a></li>
+                                    <!-- Các trang sẽ được tạo động bằng JS -->
+                                    <li class="page-item" id="news-next-page"><a class="page-link" href="#">Next</a></li>
+                                </ul>
+                            </nav>
+                            <div class="total-count">Tổng: <span id="total-news-count"></span> bản ghi (<span id="news-items-per-page">10</span>/trang)</div>
+                        </div>
+                    </div>
+
+                    <!-- Modal thêm/sửa tin tức -->
+                    <div id="news-modal" class="modal">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 id="news-modal-title">Thêm tin tức mới</h2>
+                                <span class="close">×</span>
+                            </div>
+                            <div class="modal-body">
+                                <form id="news-form" method="post" enctype="multipart/form-data">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" id="news-id" name="MaTinTuc" />
+                                    <div class="form-group">
+                                        <label for="news-title">Tiêu đề</label>
+                                        <input type="text" id="news-title" name="TieuDe" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="news-type">Loại tin tức</label>
+                                        <select id="news-type" name="MaLoaiTinTuc" required>
+                                            <option value="">Chọn loại tin tức</option>
+                                            <!-- Options will be loaded dynamically -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="news-user">Người đăng</label>
+                                        <select id="news-user" name="MaNguoiDung" required>
+                                            <option value="">Chọn người dùng</option>
+                                            <!-- Options will be loaded dynamically -->
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="news-image">Hình ảnh</label>
+                                        <input type="file" id="news-image" name="imageFile" accept="image/*">
+                                        <div class="image-preview" id="news-image-preview">
+                                            <!-- Image preview will be displayed here -->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="news-desc">Mô tả</label>
+                                        <textarea id="news-desc" name="MoTa" rows="10" required></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <div class="form-actions">
+                                            <button type="button" class="btn btn-secondary" id="news-btn-cancel">Hủy</button>
+                                            <button type="submit" class="btn btn-primary" id="news-btn-save">Lưu</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal thêm/sửa hóa đơn -->
+                <div id="hoadon-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="hoadon-modal-title">Thêm hóa đơn mới</h2>
+                            <span class="close">×</span>
+                        </div>
+                        <div class="modal-body">
+                            <form id="hoadon-form" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" id="hoadon-id" name="MaHoaDon" />
+                                <div class="form-group">
+                                    <label for="hoadon-hopdong">Hợp đồng</label>
+                                    <select id="hoadon-hopdong" name="MaHopDong" required>
+                                        <option value="">Chọn hợp đồng</option>
+                                        @if (Model.HopDongs != null && Model.HopDongs.Any())
+                                        {
+                                            @foreach (var hopDong in Model.HopDongs)
+                                            {
+                                                @if (hopDong.TrangThai == "Đang hiệu lực")
+                                                {
+                                                    <option value="@hopDong.MaHopDong" data-maphong="@hopDong.MaPhong" data-giathue="@hopDong.PhongTro.GiaThue">Mã HĐ: @hopDong.MaHopDong - Phòng: @hopDong.PhongTro.TenPhong - Người dùng: @hopDong.NguoiDung.HoTen</option>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option value="" disabled>Chưa có hợp đồng. Vui lòng tạo hợp đồng trước.</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group" >
+                                    <label for="hoadon-thang">Tháng/Năm</label>
+                                <input type="month" id="hoadon-thang" name="Thang" class="form-control input-month-wide"  required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hoadon-tienphong">Tiền phòng (VNĐ)</label>
+                                    <input type="number" id="hoadon-tienphong" name="TienPhong" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tiền điện (VNĐ)</label>
+                                    <div class="meter-group">
+                                        <div class="meter-subgroup">
+                                            <div class="meter-row">
+                                                <div class="meter-item">
+                                                    <label for="hoadon-chisoDienCu">Chỉ số cũ</label>
+                                                    <input type="number" id="hoadon-chisoDienCu" name="CSDienCu" readonly>
+                                                </div>
+                                                <div class="meter-item">
+                                                    <label for="hoadon-chisoDienMoi">Chỉ số mới</label>
+                                                    <input type="number" id="hoadon-chisoDienMoi" name="CSDienMoi" min="0" required>
+                                                </div>
+                                            </div>
+                                            <div class="meter-item">
+                                                <label for="hoadon-tienDien">Tiền điện</label>
+                                                <input type="number" id="hoadon-tienDien" name="TienDien" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tiền nước (VNĐ)</label>
+                                    <div class="meter-group">
+                                        <div class="meter-subgroup">
+                                            <div class="meter-row">
+                                                <div class="meter-item">
+                                                    <label for="hoadon-chisoNuocCu">Chỉ số cũ</label>
+                                                    <input type="number" id="hoadon-chisoNuocCu" name="CSNuocCu" readonly>
+                                                </div>
+                                                <div class="meter-item">
+                                                    <label for="hoadon-chisoNuocMoi">Chỉ số mới</label>
+                                                    <input type="number" id="hoadon-chisoNuocMoi" name="CSNuocMoi" min="0" required>
+                                                </div>
+                                            </div>
+                                            <div class="meter-item">
+                                                <label for="hoadon-tienNuoc">Tiền nước</label>
+                                                <input type="number" id="hoadon-tienNuoc" name="TienNuoc" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="form-group">
+                                <label for="hoadon-tienrac">Tiền rác (VNĐ)</label>
+                                <input type="number" id="hoadon-tienrac" name="TienRac" value="0" required>
+                            </div>
+                                <div class="form-group">
+                                    <label for="hoadon-tongtien">Tổng tiền (VNĐ)</label>
+                                    <input type="number" id="hoadon-tongtien" name="TongTien" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hoadon-trangthai">Trạng thái</label>
+                                    <select id="hoadon-trangthai" name="TrangThai" required>
+                                        <option value="Chưa thanh toán">Chưa thanh toán</option>
+                                        <option value="Đã thanh toán">Đã thanh toán</option>
+                                    </select>
+                                </div>
+                                <div class="modal-footer">
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" id="hoadon-btn-cancel">Hủy</button>
+                                        <button type="submit" class="btn btn-primary" id="hoadon-btn-save">Lưu</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    
+
+    <!-- Modal xác nhận hành động -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content confirm-modal">
+            <div class="modal-header">
+                <h2>Xác nhận</h2>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-message">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btn-confirm-cancel">Hủy</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-do">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm/sửa phòng -->
+    <div id="room-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Thêm phòng mới</h2>
+                <span class="close">×</span>
+            </div>
+            <div class="modal-body">
+                <form id="room-form" asp-action="Add" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="room-name">Tên phòng</label>
+                        <input type="text" id="room-name" name="TenPhong" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-type">Loại phòng</label>
+                         @if (ViewBag.LoaiPhongs != null )
+                         {
+                             <select id="room-type" name="MaLoaiPhong" required>
+                                 <option value="">Chọn loại phòng</option>
+                                @foreach (var loaiPhong in ViewBag.LoaiPhongs)
+                                {
+                                <option value="@loaiPhong.MaLoaiPhong">@loaiPhong.TenLoaiPhong</option>
+                                }
+                             </select>
+                         }
+                         else
+                         {
+                             <p>Không có dữ liệu loại phòng.</p>
+                         }
+                    </div>
+                    <div class="form-group">
+                        <div class="address-group">
+                            <div class="form-sub-group">
+                                <label for="province">Tỉnh/Thành phố</label>
+                                <select id="province" name="Province" required>
+                                    <option value="">Chọn Tỉnh/Thành phố</option>
+                                </select>
+                            </div>
+                            <div class="form-sub-group">
+                                <label for="district">Huyện/Quận</label>
+                                <select id="district" name="District" required>
+                                    <option value="">Chọn Huyện/Quận</option>
+                                </select>
+                            </div>
+                            <div class="form-sub-group">
+                                <label for="house-number">Số nhà</label>
+                                <input type="text" id="house-number" name="HouseNumber" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-area">Diện tích (m²)</label>
+                        <input type="number" id="room-area" name="DienTich" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-electronic">Tiền điện (kWh)</label>
+                        <input type="number" id="room-electronic" name="TienDien" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-water">Tiền nước (m³)</label>
+                        <input type="number" id="room-water" name="TienNuoc" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-price">Giá thuê (VNĐ)</label>
+                        <input type="number" id="room-price" name="GiaThue" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Thiết bị</label>
+                        <div class="checkbox-grid" id="thiet-bi-list">
+                            @if (ViewBag.ThietBis != null)
+                            {
+                                @foreach (var thietBi in ViewBag.ThietBis)
+                                {
+                                    <div class="thiet-bi-item">
+                                        <div class="thiet-bi-row">
+                                            <label>
+                                                <input type="checkbox" name="ThietBiIds" value="@thietBi.MaThietBi">
+                                                <span class="thiet-bi-name">@thietBi.TenThietBi</span>
+                                            </label>
+                                            <input type="number" name="SoLuong_@thietBi.MaThietBi" min="1" value="1" class="so-luong" style="display: none;">
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-status">Trạng thái</label>
+                        <select id="room-status" name="TrangThai">
+                            <option value="Còn trống">Còn trống</option>
+                            <option value="Đã thuê">Đã thuê</option>
+                            <option value="Đang sửa chữa">Đang sửa chữa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-desc">Mô tả</label>
+                        <textarea id="room-desc" name="MoTa" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Ảnh phòng</label>
+                        <div class="image-upload">
+                            <input type="file" id="room-images" name="Images" multiple accept="image/*">
+                            <label for="room-images" class="upload-btn">
+                                <i class="fas fa-upload"></i> Tải ảnh lên
+                            </label>
+                        </div>
+                        <div class="image-preview" id="image-preview">
+                            <!-- Danh sách ảnh sẽ được hiển thị ở đây -->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="btn-cancel">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal thêm/sửa loại phòng -->
+    <div id="room-type-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="room-type-modal-title">Thêm loại phòng mới</h2>
+                <span class="close">×</span>
+            </div>
+            <div class="modal-body">
+                <form id="room-type-form" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="room-type-name">Tên loại phòng</label>
+                        
+                        <input type="text" id="room-type-name" name="TenLoaiPhong" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="room-type-desc">Mô tả</label>
+                        <textarea id="room-type-desc" name="MoTa" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="room-type-btn-cancel">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm/sửa thiết bị -->
+    <div id="equipment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="equipment-modal-title">Thêm thiết bị mới</h2>
+                <span class="close">×</span>
+            </div>
+            <div class="modal-body">
+                <form id="equipment-form" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        <label for="equipment-name">Tên thiết bị</label>
+                        <input type="text" id="equipment-name" name="TenThietBi" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-desc">Mô tả</label>
+                        <textarea id="equipment-desc" name="MoTa" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-situation">Tình Trạng</label>
+                        <input type="text" id="equipment-situation" name="TinhTrang" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="equipment-unit">Đơn vị tính</label>
+                        <input type="text" id="equipment-unit" name="DonViTinh" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="equipment-btn-cancel">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Lưu</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal thêm/sửa hợp đồng -->
+    <div id="hopdong-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="hopdong-modal-title">Thêm hợp đồng mới</h2>
+                <span class="close">×</span>
+            </div>
+            <div class="modal-body">
+                <form id="hopdong-form" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="hopdong-id" name="MaHopDong" />
+                    <div class="form-group">
+                        <label for="hopdong-maphong">Phòng</label>
+                        <select id="hopdong-maphong" name="MaPhong" required>
+                            <option value="">Chọn phòng</option>
+                            @if (Model.PhongTros != null && Model.PhongTros.Any())
+                            {
+                                @foreach (var phong in Model.PhongTros)
+                                {
+                                    @if (phong.TrangThai == "Còn trống")
+                                    {
+                                        <option value="@phong.MaPhong" data-giathue="@phong.GiaThue">@phong.TenPhong (Mã: @phong.MaPhong)</option>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <option value="" disabled>Chưa có phòng. Vui lòng <a href="#" data-section="room-list-section">tạo phòng</a> trước.</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Chọn cách nhập người dùng -->
+                    <div class="form-group">
+                        <label>Chọn cách nhập người dùng:</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="existing-user" name="userInputType" value="existing" checked>
+                                <label for="existing-user">Chọn người dùng hiện có</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="new-user" name="userInputType" value="new">
+                                <label for="new-user">Nhập người dùng mới</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dropdown chọn người dùng hiện có -->
+                    <div class="form-group" id="existing-user-group">
+                        <label for="hopdong-nguoidung">Người dùng</label>
+                        <select id="hopdong-nguoidung" name="MaNguoiDung" required>
+                            <option value="">Chọn người dùng</option>
+                            @if (Model.NguoiDungs != null && Model.NguoiDungs.Any())
+                            {
+                                @foreach (var nguoiDung in Model.NguoiDungs)
+                                {
+                                    <option value="@nguoiDung.MaNguoiDung">@nguoiDung.HoTen (Email: @nguoiDung.Email)</option>
+                                }
+                            }
+                            else
+                            {
+                                <option value="" disabled>Chưa có người dùng. Vui lòng <a href="#" data-section="user-section">tạo người dùng</a> trước.</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Nhập thông tin người dùng mới -->
+                    <div class="form-group" id="new-user-group" style="display: none;">
+                        <label>Thông tin người dùng mới</label>
+                        <div class="form-sub-group">
+                            <label for="new-user-fullname">Họ tên</label>
+                            <input type="text" id="new-user-fullname" name="NewUserHoTen">
+                        </div>
+                        <div class="form-sub-group">
+                            <label for="new-user-email">Email</label>
+                            <input type="email" id="new-user-email" name="NewUserEmail">
+                        </div>
+                        <div class="form-sub-group">
+                            <label for="new-user-phone">Số điện thoại</label>
+                            <input type="text" id="new-user-phone" name="NewUserSoDienThoai">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hopdong-ngaybatdau">Ngày bắt đầu</label>
+                        <input type="date" id="hopdong-ngaybatdau" name="NgayBatDau" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hopdong-ngayketthuc">Ngày kết thúc</label>
+                        <input type="date" id="hopdong-ngayketthuc" name="NgayKetThuc" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hopdong-tiencoc">Tiền cọc (VNĐ)</label>
+                        <input type="text" id="hopdong-tiencoc" name="TienCoc" min="0" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="hopdong-trangthai">Trạng thái</label>
+                        <select id="hopdong-trangthai" name="TrangThai" required>
+                            <option value="Đang hiệu lực">Đang hiệu lực</option>
+                            <option value="Hết hiệu lực">Hết hiệu lực</option>
+                        </select>
+                    </div>
+                        <div class="form-group">
+                            <label for="hopdong-phuongthuc-thanhtoan">Phương thức thanh toán</label>
+                            <select id="hopdong-phuongthuc-thanhtoan" name="PhuongThucThanhToan" required>
+                                <option value="Chưa thanh toán">Chưa thanh toán</option>
+                                <option value="Tiền mặt">Tiền mặt</option>
+                            </select>
+                        </div>
+                    <div class="form-group">
+                        <label for="hopdong-ngayky">Ngày ký</label>
+                        <input type="datetime-local" id="hopdong-ngayky" name="NgayKy" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hopdong-ghichu">Ghi chú</label>
+                        <textarea id="hopdong-ghichu" name="GhiChu" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="hopdong-btn-cancel">Hủy</button>
+                            <button type="submit" class="btn btn-primary" id="hopdong-btn-save">Lưu</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @section Scripts {
+        <script>
+            const baseUrl = window.location.origin; // Ví dụ: http://localhost:5000
+            window.getAllPhongTrosUrl = `${baseUrl}@Url.Action("GetAll", "PhongTro", new { area = "Admin" })`;
+            window.addRoomUrl = `${baseUrl}@Url.Action("Add", "PhongTro", new { area = "Admin" })`;
+            window.updateRoomUrl = `${baseUrl}@Url.Action("Update", "PhongTro", new { area = "Admin" })`;
+            window.getRoomUrl = `${baseUrl}@Url.Action("GetById", "PhongTro", new { area = "Admin" })`;
+            window.addRoomTypeUrl = `${baseUrl}@Url.Action("Add", "LoaiPhong", new { area = "Admin" })`;
+            window.updateRoomTypeUrl = `${baseUrl}@Url.Action("Update", "LoaiPhong", new { area = "Admin" })`;
+            window.getRoomTypesUrl = `${baseUrl}@Url.Action("GetAll", "LoaiPhong", new { area = "Admin" })`;
+            window.addEquipmentUrl = `${baseUrl}@Url.Action("Add", "ThietBi", new { area = "Admin" })`;
+            window.updateEquipmentUrl = `${baseUrl}@Url.Action("Update", "ThietBi", new { area = "Admin" })`;
+            window.getEquipmentsUrl = `${baseUrl}@Url.Action("GetAll", "ThietBi", new { area = "Admin" })`;
+            window.addUserUrl = `${baseUrl}@Url.Action("Add", "NguoiDung", new { area = "Admin" })`;
+            window.updateUserUrl = `${baseUrl}@Url.Action("Update", "NguoiDung", new { area = "Admin" })`;
+            window.getUsersUrl = `${baseUrl}@Url.Action("GetAll", "NguoiDung", new { area = "Admin" })`;
+            window.getRolesUrl = `${baseUrl}@Url.Action("GetAll", "PhanQuyen", new { area = "Admin" })`;
+            window.getHopDongsUrl = `${baseUrl}@Url.Action("GetAll", "HopDong", new { area = "Admin" })`;
+            window.getHopDongUrl = `${baseUrl}@Url.Action("GetById", "HopDong", new { area = "Admin" })`;
+            window.addHopDongUrl = `${baseUrl}@Url.Action("Add", "HopDong", new { area = "Admin" })`;
+            window.getAllNullPhongTrosUrl = `${baseUrl}@Url.Action("GetAllNullRoom", "PhongTro", new { area = "Admin" })`;
+            window.updateHopDongUrl = `${baseUrl}@Url.Action("Update", "HopDong", new { area = "Admin" })`;
+            window.deleteHopDongUrl = `${baseUrl}@Url.Action("Delete", "HopDong", new { area = "Admin" })`;
+            window.getHoaDonUrl = `${baseUrl}@Url.Action("GetAll", "HoaDon", new { area = "Admin" })`;
+            window.addHoaDonUrl = `${baseUrl}@Url.Action("Add", "HoaDon", new { area = "Admin" })`;
+            window.updateHoaDonUrl = `${baseUrl}@Url.Action("Update", "HoaDon", new { area = "Admin" })`;
+            window.getTinTucsUrl = `${baseUrl}@Url.Action("GetAll", "TinTuc", new { area = "Admin" })`;
+            window.getTinTucByIdUrl = `${baseUrl}@Url.Action("GetById", "TinTuc", new { area = "Admin" })`;
+            window.addTinTucUrl = `${baseUrl}@Url.Action("Add", "TinTuc", new { area = "Admin" })`;
+            window.updateTinTucUrl = `${baseUrl}@Url.Action("Update", "TinTuc", new { area = "Admin" })`;
+            window.deleteTinTucUrl = `${baseUrl}@Url.Action("Delete", "TinTuc", new { area = "Admin" })`;
+            window.getLoaiTinTucsUrl = `${baseUrl}@Url.Action("GetLoaiTinTucs", "TinTuc", new { area = "Admin" })`;
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-rc.0/js/select2.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="~/js/siteAdmin.js" defer></script>
+        <script src="~/js/siteAdminHD.js" defer></script>
+        <script src="~/js/siteAdminHoaDon.js" defer></script>
+        <script src="~/js/siteAdminDoanhThu.js" defer></script>   
+        <script src="~/js/siteAdminSuCo.js" defer> </script>
+        <script src="~/js/siteAdminTinTuc.js" defer></script>
+    }
+</body>
+</html>

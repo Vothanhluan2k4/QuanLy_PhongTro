@@ -1,0 +1,9 @@
+﻿@model IEnumerable<ThietBiModel>
+
+@foreach (var item in Model)
+{
+    <label class="filter-option">
+        <input type="checkbox" name="amenities" value="@item.MaThietBi" id="amenity-@item.MaThietBi">
+        @item.TenThietBi
+    </label>
+}

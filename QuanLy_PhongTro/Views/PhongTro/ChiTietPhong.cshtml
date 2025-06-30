@@ -1,0 +1,292 @@
+﻿@model QuanLy_PhongTro.Models.PhongTroModel
+@{
+    ViewData["Title"] = "Chi tiết phòng trọ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/css/siteChiTietPhong.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div id="toast-container" class="toast-container"></div>        
+
+<div class="room-detail-container">
+    <!-- Phần hiển thị ảnh -->
+    <div class="room-images-section">
+        <div class="main-image">
+            @if (Model.AnhPhongTros != null && Model.AnhPhongTros.Any(a => a.LaAnhDaiDien))
+            {
+                <img src="~/asset/@Model.AnhPhongTros.First(a => a.LaAnhDaiDien).DuongDan" alt="Ảnh đại diện" id="main-image">
+            }
+            else
+            {
+                <img src="~/asset/default-room.jpg" alt="Ảnh mặc định" id="main-image">
+            }
+        </div>
+
+        <div class="thumbnail-container">
+            @if (Model.AnhPhongTros != null && Model.AnhPhongTros.Any())
+            {
+                @foreach (var anh in Model.AnhPhongTros)
+                {
+                    <div class="thumbnail" onclick="changeMainImage('/asset/@anh.DuongDan')">
+                        <img src="~/asset/@anh.DuongDan" alt="Ảnh phòng">
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    
+
+    <!-- Phần thông tin chi tiết -->
+    <div class="room-info-section">
+        <h1 class="room-title">Tên phòng: @Model.TenPhong</h1>
+        <div class="room-address">
+            <i class="fas fa-map-marker-alt"></i> @Model.DiaChi
+        </div>
+
+        <div class="room-price">
+            <span class="price">@Model.GiaThue.ToString("N0") VNĐ</span>
+            <span class="per-month">/tháng</span>
+        </div>
+
+        <div class="room-meta">
+            <div class="meta-item">
+                <i class="fas fa-ruler-combined"></i>
+                <span>@Model.DienTich m²</span>
+            </div>
+            <div class="meta-item">
+                <i class="fas fa-home"></i>
+                <span>@Model.LoaiPhong?.TenLoaiPhong</span>
+            </div>
+            <div class="meta-item status @(Model.TrangThai == "Còn trống" ? "available" : "rented")">
+                <i class="fas fa-circle"></i>
+                <span>@Model.TrangThai</span>
+            </div>
+        </div>
+
+        <div class="room-description">
+            <h3>Mô tả</h3>
+            <p>@(string.IsNullOrEmpty(Model.MoTa) ? "Không có mô tả" : Model.MoTa)</p>
+        </div>
+
+        <div class="room-amenities">
+            <h3>Tiện nghi</h3>
+            <div class="amenities-grid">
+                @if (Model.PhongTroThietBis != null && Model.PhongTroThietBis.Any())
+                {
+                    @foreach (var tb in Model.PhongTroThietBis)
+                    {
+                        <div class="amenity-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>@tb.ThietBi?.TenThietBi SL:@tb.SoLuong</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>Không có thông tin tiện nghi</p>
+                }
+            </div>
+        </div>
+        <div class="price-WaterElec">
+            <h3>Tiền điện: <span class="price-water">@Model.TienDien.ToString("N0") VNĐ</span></h3>
+            <h3>Tiền nước: <span class="price-electronic">@Model.TienNuoc.ToString("N0") VNĐ</span></h3>
+        </div>    
+    </div>
+
+    <!-- Phần form đặt phòng -->
+    <div class="booking-section">
+        <div class="booking-card">
+            <a href="#" id="btn-book" class="btn-book" data-ma-phong="@Model.MaPhong">Đặt phòng</a>
+        </div>
+    </div>
+    <div class="room-location text-center">
+        <h3><i class="fas fa-map-marker-alt"></i> Vị trí phòng trọ</h3>
+        <p>@Model.DiaChi</p>
+        <div class="map-container">
+            <iframe width="100%"
+                    height="400"
+                    style="border:0"
+                    loading="lazy"
+                    allowfullscreen
+                    referrerpolicy="no-referrer-when-downgrade"
+                    src="https://www.google.com/maps?q=@Uri.EscapeDataString(Model.DiaChi)&output=embed">
+            </iframe>
+        </div>
+    </div>
+</div>
+<div class="room-relative">
+    <p>PHÒNG DÀNH CHO BẠN</p>
+    <div class="related-rooms">
+        @if (Model.RelatedRooms != null && Model.RelatedRooms.Any())
+        {
+            foreach (var room in Model.RelatedRooms)
+            {
+                <div class="related-room-item" onclick="window.location.href='/phong-tro/chi-tiet/@room.MaPhong'">
+                    <div class="image-container">
+                        <!-- Ảnh chính (ảnh đại diện) -->
+                        <img src="~/asset/@(room.AnhPhongTros?.FirstOrDefault(a => a.LaAnhDaiDien)?.DuongDan ?? "default-room.jpg")"
+                             alt="Ảnh phòng @room.TenPhong"
+                             class="main-image">
+
+                        <!-- Ảnh hover (ảnh phụ đầu tiên không phải ảnh đại diện) -->
+                        @{
+                            var hoverImage = room.AnhPhongTros?.FirstOrDefault(a => !a.LaAnhDaiDien);
+                        }
+                        @if (hoverImage != null)
+                        {
+                            <img src="~/asset/@hoverImage.DuongDan"
+                                 alt="Ảnh phòng @room.TenPhong"
+                                 class="hover-image">
+                        }
+                        else
+                        {
+                            <!-- Nếu không có ảnh phụ, dùng ảnh đại diện cho hover -->
+                            <img src="~/asset/@(room.AnhPhongTros?.FirstOrDefault(a => a.LaAnhDaiDien)?.DuongDan ?? "default-room.jpg")"
+                                 alt="Ảnh phòng @room.TenPhong"
+                                 class="hover-image">
+                        }
+                    </div>
+
+                    <div class="related-room-info">
+                        <div>
+                            <h4 class="related-room-title">@room.TenPhong</h4>
+                            <p class="related-room-price">@room.GiaThue.ToString("N0") VNĐ/tháng</p>
+                            <p class="related-room-type">@room.LoaiPhong?.TenLoaiPhong</p>
+                        </div>
+                        <p class="related-room-status @(room.TrangThai == "Còn trống" ? "available" : "rented")">
+                            @room.TrangThai
+                        </p>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p>Không có phòng liên quan.</p>
+        }
+    </div>
+</div>
+
+<!-- Modal xác nhận đăng nhập -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <h2>Bạn cần đăng nhập để đặt phòng</h2>
+        <p>Bạn muốn đi đến trang đăng nhập?</p>
+        <div class="modal-buttons">
+            <button id="cancelBtn" class="btn-cancel">Hủy</button>
+            <a href="@Url.Action("Index", "DangNhap", new { returnUrl = Url.Action("ChiTietPhong", "PhongTro", new { id = Model.MaPhong }) })"
+               class="btn-login">Đi đến trang đăng nhập</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        window.tempData = {
+            successMessage: '@Html.Raw(Json.Serialize(TempData["SuccessMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16))),
+            errorMessage: '@Html.Raw(Json.Serialize(TempData["ErrorMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16))),
+            showLoginModal: '@Html.Raw(Json.Serialize(TempData["ShowLoginModal"]))',
+            trangThai: '@Html.Raw(Model.TrangThai?.Trim().Replace("\n", "").Replace("\r", "") ?? "Không xác định")'
+        };
+
+        function changeMainImage(src) {
+            document.getElementById('main-image').src = src;
+        }
+
+        function showToast(message, type = 'success') {
+            console.log('Showing toast:', message, type);
+            const toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                console.error('Toast container not found!');
+                return;
+            }
+            const toast = document.createElement('div');
+            toast.classList.add('toast');
+            toast.classList.add(type === 'success' ? 'toast-success' : 'toast-error');
+            toast.innerHTML = `
+                        <span class="toast-icon">${type === 'success' ? '✔' : '✖'}</span>
+                        <span class="toast-message">${message}</span>
+                        <span class="toast-close">×</span>
+                    `;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 500);
+            });
+        }
+
+        function handleNotification() {
+            const { successMessage, errorMessage, showLoginModal, trangThai } = window.tempData;
+
+            if (successMessage && successMessage !== 'null' && successMessage !== '""') {
+                showToast(successMessage, 'success');
+            } else if (errorMessage && errorMessage !== 'null' && errorMessage !== '""') {
+                showToast(errorMessage, 'error');
+            }
+
+            // Mở modal nếu showLoginModal = true
+            if (showLoginModal && showLoginModal.toLowerCase() === 'true') {
+                const modal = document.getElementById('loginModal');
+                if (modal) {
+                    modal.style.display = 'block';
+                }
+            }
+        }
+
+        // Hiển thị modal nếu TempData["ShowLoginModal"] tồn tại
+        document.addEventListener('DOMContentLoaded', function () {
+            handleNotification();
+
+            const btnBook = document.getElementById('btn-book');
+            if (btnBook) {
+                btnBook.addEventListener('click', function (e) {
+                    e.preventDefault(); 
+                    const maPhong = this.getAttribute('data-ma-phong');
+                    const trangThai = window.tempData.trangThai.trim();
+
+                    if (trangThai === "Còn trống") {
+                        if (!isLoggedIn()) { 
+                            const modal = document.getElementById('loginModal');
+                            if (modal) {
+                                modal.style.display = 'block';
+                            }
+                        } else {
+                            window.location.href = `/DatPhong/DatPhong?maPhong=${maPhong}`;
+                        }
+                    } else {
+                        // Hiển thị thông báo nếu phòng không còn trống
+                        showToast('Phòng đã được thuê, không thể đặt!', 'error');
+                    }
+                });
+            }
+
+            // Đóng modal khi bấm "Hủy"
+            var cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function () {
+                    var modal = document.getElementById('loginModal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            }
+
+            // Đóng modal khi bấm ra ngoài
+            window.addEventListener('click', function (event) {
+                var modal = document.getElementById('loginModal');
+                if (modal && event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        function isLoggedIn() {
+            return '@User.Identity.IsAuthenticated'.toLowerCase() === 'true';
+        }
+    </script>
+}

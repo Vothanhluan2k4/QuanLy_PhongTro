@@ -1,0 +1,123 @@
+﻿
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.success-message {
+    color: green;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.payment-info {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+    .payment-info p {
+        margin: 5px 0;
+    }
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+/* Thông báo */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.5s ease-out;
+    min-width: 250px;
+}
+
+.toast-success {
+    border-left: 5px solid #28a745;
+    color: #155724;
+}
+
+.toast-error {
+    border-left: 5px solid #dc3545;
+    color: #721c24;
+}
+/* Thêm kiểu dáng cho toast-info */
+.toast-info {
+    background-color: #2196F3; /* Màu xanh dương */
+    color: white;
+}
+
+.toast-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 14px;
+}
+
+.toast-close {
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.hide {
+    animation: slideOut 0.5s ease-out forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}

@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swiper Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <link rel="stylesheet" href="~/css/siteMain.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="~/js/siteMain.js"></script>
+</head>
+<body>
+    <div class="swiper-main-container">
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide"><img src="./asset/nguyencan1.jpg" alt="Phòng trọ 1"></div>
+                <div class="swiper-slide"><img src="./asset/chungcu1.jpg" alt="Phòng trọ 2"></div>
+                <div class="swiper-slide"><img src="./asset/nguyencan2.jpg" alt="Phòng trọ 3"></div>
+                <div class="swiper-slide"><img src="./asset/chungcu2.jpg" alt="Phòng trọ 4"></div>
+                <div class="swiper-slide"><img src="./asset/phongtro1.jpg" alt="Phòng trọ 5"></div>
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+    <div class="content">
+        <section class="intro">
+            <hr><b>Phòng Trọ Vui Vẻ</b> là nền tảng tìm kiếm & đặt phòng trọ hàng đầu tại Việt Nam.
+            Chúng tôi chuyên cung cấp thông tin về <b>phòng trọ, nhà trọ, nhà nguyên căn</b>. Với giao diện hiện đại,
+            dễ sử dụng, cùng công nghệ lọc tin thông minh, Phòng Trọ Vui Vẻ giúp hàng ngàn người dùng mỗi tháng
+            tìm được nơi ở ưng ý một cách nhanh chóng và an toàn nhất.
+        </section>
+        <section class="image">
+            <img src="~/asset/canho3.jpg" alt="Ảnh trọ mô tả" class="img_MoTa">
+        </section>
+        <section class="advantage">
+            <h2>ƯU THẾ DẪN ĐẦU CỦA PHÒNG TRỌ VUI VẺ</h2>
+            <ul>
+                <li>Nơi kết nối chất lượng: Kết nối hàng nghìn người truy cập ở khắp đất nước việt nam</li>
+                <li>Trải nghiệm người dùng xuất sắc: Tốc độ tìm kiếm nhanh, chính xác, hiển thị đầy đủ thông tin về phòng trọ.</li>
+                <li>Cộng đồng vui vẻ: Không chỉ là nơi thuê phòng, mà còn là nơi người thuê có thể đọc tin tức từ Chủ trọ.</li>
+            </ul>
+        </section>
+        <button class="toggle-btn" onclick="toggleContent()">Xem thêm...</button>
+        <section id="extraContent1" class="features`">
+            <h2>LỢI THẾ CẠNH TRANH VƯỢT TRỘI</h2>
+            <img src="~/asset/canhtranh1vs4.jpg" alt="Ảnh cạnh tranh" class="img_CanhTranh">
+            <ul>
+                <li>
+                    <b>Dữ liệu phong phú, cập nhật liên tục:</b>
+                    Phòng Trọ Vui Vẻ mang đến nguồn dữ liệu mới nhất, từ nhà nguyên căn, căn hộ, phòng trọ giá rẻ, đáp ứng mọi nhu cầu của người dùng.
+                </li>
+                <li>
+                    <b>Chức năng tìm kiếm thông minh:</b>
+                    Dễ dàng lọc thông tin theo vị trí, diện tích, giá thuê, tiện ích giúp người thuê tiết kiệm thời gian.
+                </li>
+                <li>
+                    <b>Hệ thống quản lý tin đăng chuyên nghiệp:</b>
+                    Bạn có thể xem hóa đơn của từng tháng với những chi tiết nhỏ bao gồm: chỉ số điện, nước,... 
+                </li>
+            </ul>
+        </section>
+        <section id="extraContent2" class="services">
+            <h2>DỊCH VỤ ĐẶC BIỆT CHO CHỦ NHÀ </h2>
+            <p>Bạn có muốn tìm phòng trọ cần thuê? Phòng Trọ Vui Vẻ sẽ giúp bạn nhanh chóng tiếp cận đúng phòng trọ bạn mong muốn 
+                nhờ các dịch vụ sau:</p>
+            <ul>
+                <li><b>Chụp ảnh chuyên nghiệp:</b> Giúp tin đăng bắt mắt, thu hút người thuê.</li>
+                <li><b>Thông tin cụ thể:</b> Người thuê có thể xem thiết bị trong không gian phòng trọ.</li>
+            </ul>
+        </section>
+        <section id="extraContent3" class="commit">
+            <h2>CAM KẾT</h2>
+            <p>
+                Chúng tôi một website là cầu nối chiến lược giữa người thuê và chủ nhà. Phòng Trọ Vui Vẻ 
+                cam kết mang lại một nền tảng minh bạch, tiện lợi, hiệu quả giúp mọi người dễ dàng tìm được không gian sống phù hợp.
+                Hãy cùng <b>Phòng Trọ Vui Vẻ</b> xây dựng một cộng đồng chia sẻ thông tin hữu ích, tìm kiếm phòng trọ dễ dàng hơn và kết nối hàng nghìn người thuê mỗi ngày!
+            </p>
+        </section>
+    </div>
+</body>
+</html>

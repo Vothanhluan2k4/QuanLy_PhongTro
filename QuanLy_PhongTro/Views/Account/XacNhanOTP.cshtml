@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận OTP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/siteDangNhap.css">
+</head>
+<body>
+    <div class="login-container">
+        <img src="~/asset/avatar.png" class="avatar" alt="Avatar">
+        <h2>Xác nhận OTP</h2>
+
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <form id="verifyOtpForm">
+            <div class="input-group">
+                <label for="otp">Mã OTP</label>
+                <input type="text" id="otp" name="otp" placeholder="Nhập mã OTP" required>
+                <span id="otpError" class="form-error"></span>
+            </div>
+
+            <button type="submit" id="submitButton" class="login-btn">Xác nhận</button>
+
+            <p class="register-text">
+                Quay lại <a asp-controller="DangNhap" asp-action="Index">Đăng nhập</a>
+            </p>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const verifyOtpForm = document.getElementById('verifyOtpForm');
+            const submitButton = document.getElementById('submitButton');
+            const otpInput = document.getElementById('otp');
+            const otpError = document.getElementById('otpError');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            verifyOtpForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                // Reset thông báo
+                otpError.textContent = '';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                otpInput.classList.remove('input-error');
+
+                // Validate OTP
+                const otpValue = otpInput.value.trim();
+                if (!otpValue) {
+                    otpError.textContent = 'Vui lòng nhập mã OTP';
+                    otpInput.classList.add('input-error');
+                    return;
+                }
+
+                // Kiểm tra định dạng OTP (6 chữ số)
+                if (!/^\d{6}$/.test(otpValue)) {
+                    otpError.textContent = 'Mã OTP phải là 6 chữ số';
+                    otpInput.classList.add('input-error');
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.textContent = 'Đang xử lý...';
+
+                try {
+                    // Gửi OTP dưới dạng JSON string
+                    const response = await fetch('/QuenMatKhau/XacNhanOTP', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(otpValue) // Gửi trực tiếp string value
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        successMessage.textContent = result.message;
+                        successMessage.style.display = 'block';
+
+                        // Chuyển hướng sau 2 giây
+                        setTimeout(() => {
+                            window.location.href = result.redirectUrl || '/QuenMatKhau/DatLaiMatKhau';
+                        }, 2000);
+                    } else {
+                        errorMessage.textContent = result.message;
+                        errorMessage.style.display = 'block';
+                    }
+                } catch (error) {
+                    errorMessage.textContent = 'Lỗi kết nối đến máy chủ';
+                    errorMessage.style.display = 'block';
+                    console.error('Error:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Xác nhận';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

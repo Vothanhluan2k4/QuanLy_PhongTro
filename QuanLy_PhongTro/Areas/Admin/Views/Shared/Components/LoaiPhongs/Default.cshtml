@@ -1,0 +1,6 @@
+﻿@model IEnumerable<LoaiPhongModel>
+
+@foreach(var iteam in Model)
+{
+    <label><input type="radio" name="roomType" value="phongtro"> @iteam.TenLoaiPhong</label>
+}

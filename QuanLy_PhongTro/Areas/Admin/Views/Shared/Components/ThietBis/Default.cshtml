@@ -1,0 +1,6 @@
+﻿@model IEnumerable<ThietBiModel>
+
+@foreach(var iteam in Model)
+{
+    <label><input type="checkbox" name="amenity" value="@iteam.MaThietBi"> @iteam.TenThietBi</label>
+}

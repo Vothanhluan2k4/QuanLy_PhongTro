@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin Tức</title>
+    <link href="~/css/siteTinTuc.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container">
+        <!-- Header với Navigation và Search -->
+        <div class="header">
+            <nav class="nav-tabs">
+                <a href="@Url.Action("Index", "TinTuc", new { tab = "TinNoiBat" })" class="nav-tab @(ViewBag.ActiveTab == "TinNoiBat" ? "active" : "")">Tin nổi bật</a>
+                <a href="@Url.Action("Index", "TinTuc", new { tab = "CamNang" })" class="nav-tab @(ViewBag.ActiveTab == "CamNang" ? "active" : "")">Cẩm nang</a>
+                <a href="@Url.Action("Index", "TinTuc", new { tab = "HuongDan" })" class="nav-tab @(ViewBag.ActiveTab == "HuongDan" ? "active" : "")">Hướng dẫn</a>
+            </nav>
+            <!--<div class="search-box">
+                <input type="text" class="search-input" placeholder="Nhập tìm kiếm" id="search-input">
+                <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            </div>-->
+        </div>
+        <div class="container-main">
+            @if (!string.IsNullOrEmpty(ViewBag.Message))
+            {
+                <div class="alert alert-info">@ViewBag.Message</div>
+            }
+            <!-- Main News Grid -->
+            <div class="news-grid">
+                <!-- Tin chính -->
+                @if (ViewBag.MainNews != null)
+                {
+                    <div class="main-news">
+                        <a href="@Url.Action("Detail", "TinTuc", new { id = ViewBag.MainNews.MaTinTuc })">
+                            <img src="@(string.IsNullOrEmpty(ViewBag.MainNews.DuongDanHinhAnh) ? "https://via.placeholder.com/1000x500" : $"/asset/{ViewBag.MainNews.DuongDanHinhAnh}")" alt="@ViewBag.MainNews.TieuDe">
+                            <div class="main-news-overlay">
+                                <h2>@ViewBag.MainNews.TieuDe</h2>
+                                <div class="news-meta">
+                                    <span class="news-category">@(ViewBag.MainNews.LoaiTinTuc?.TenLoaiTinTuc ?? "Tin nổi bật")</span>
+                                    <span>@ViewBag.MainNews.NgayDang.ToString("dd/MM/yyyy")</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="main-news">
+                        <img src="https://via.placeholder.com/1000x500" alt="Tin chính mặc định">
+                        <div class="main-news-overlay">
+                            <h2>Không có tin tức</h2>
+                            <div class="news-meta">
+                                <span class="news-category">Tin nổi bật</span>
+                                <span>@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Sidebar News -->
+                <div class="sidebar-news">
+                    @foreach (var item in ViewBag.SidebarNews)
+                    {
+                        <div class="news-item">
+                            <a href="@Url.Action("Detail", "TinTuc", new { id = item.MaTinTuc })">
+                                <div class="news-date">@item.NgayDang.ToString("dd/MM/yyyy")</div>
+                                <div class="news-content">
+                                    <h3>@item.TieuDe</h3>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Secondary Featured Cards -->
+            <div class="secondary-grid">
+                @foreach (var item in ViewBag.SecondaryNews)
+                {
+                    <div class="featured-card">
+                        <a href="@Url.Action("Detail", "TinTuc", new { id = item.MaTinTuc })">
+                            <img src="@(string.IsNullOrEmpty(item.DuongDanHinhAnh) ? "https://via.placeholder.com/500x300" : $"/asset/{item.DuongDanHinhAnh}")" alt="@item.TieuDe">
+                            <div class="featured-overlay">
+                                <h3>@item.TieuDe</h3>
+                                <div class="featured-date">@item.NgayDang.ToString("dd/MM/yyyy")</div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Xử lý click tab navigation (đã được xử lý bởi Razor qua URL)
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function (e) {
+                console.log('Tab clicked:', this.textContent);
+                // Logic đã được xử lý bởi Razor qua Url.Action
+            });
+        });
+
+        // Xử lý search
+        document.getElementById('search-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const searchTerm = this.value;
+                // Điều hướng đến trang với tham số tìm kiếm
+                window.location.href = `@Url.Action("Index", "TinTuc")` + `?tab=${ViewBag.ActiveTab}&search=${encodeURIComponent(searchTerm)}`;
+            }
+        });
+
+        // Xử lý click tin tức
+        document.querySelectorAll('.news-item a, .main-news a, .featured-card a').forEach(item => {
+            item.addEventListener('click', function (e) {
+                console.log('News item clicked:', this.textContent);
+                // Logic đã được xử lý bởi Razor qua Url.Action
+            });
+        });
+    </script>
+    <style>
+        .alert {
+            padding: 10px;
+            background-color: #f8d7da;
+            color: #721c24;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+</body>
+</html>

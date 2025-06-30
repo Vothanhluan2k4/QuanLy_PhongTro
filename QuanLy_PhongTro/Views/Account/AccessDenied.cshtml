@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Truy cập bị từ chối";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    .access-denied-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .lock-icon {
+        font-size: 10rem; /* Kích thước lớn cho biểu tượng */
+        color: #dc3545; /* Màu đỏ để phù hợp với text-danger */
+        margin-bottom: 20px;
+    }
+
+    .access-denied-message h2 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    .access-denied-message p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+        color: #666;
+    }
+
+    .access-denied-message .btn {
+        padding: 10px 20px;
+        font-size: 1.1rem;
+    }
+
+    .access-denied-message a {
+        text-decoration: none;
+        color: green;
+        font-size: 20px !important;
+    }
+
+        .access-denied-message a:hover {
+            color: red;
+            opacity: 0.8;
+        }
+</style>
+
+<div class="access-denied-container">
+    <div class="lock-icon">
+        <i class="fas fa-lock"></i> <!-- Font Awesome lock icon -->
+    </div>
+    <div class="access-denied-message">
+        <h2 class="text-danger">Truy cập bị từ chối</h2>
+        <p>Bạn không có quyền truy cập vào khu vực này. Vui lòng liên hệ quản trị viên nếu bạn tin rằng đây là lỗi.</p>
+        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Quay về trang chủ</a>
+        @if (!string.IsNullOrEmpty(ViewData["ReturnUrl"]?.ToString()))
+        {
+            <p>Hoặc <a href="@ViewData["ReturnUrl"]">thử lại</a>.</p>
+        }
+    </div>
+</div>

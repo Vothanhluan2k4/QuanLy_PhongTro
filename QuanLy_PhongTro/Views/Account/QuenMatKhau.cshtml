@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quên mật khẩu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/siteDangNhap.css">
+</head>
+<body>
+    <div class="login-container">
+        <img src="~/asset/avatar.png" class="avatar" alt="Avatar">
+        <h2>Quên mật khẩu</h2>
+
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <form id="forgotPasswordForm" method="post" action="/QuenMatKhau/GuiOTP">
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Nhập email của bạn" required>
+                <span id="emailError" class="form-error"></span>
+            </div>
+
+            <button type="submit" id="submitButton" class="login-btn">Gửi mã OTP</button>
+
+            <p class="register-text">
+                Quay lại <a asp-controller="DangNhap" asp-action="Index">Đăng nhập</a>
+            </p>
+        </form>
+    </div>
+
+    <script src="~/js/siteQuenMatKhau.js"></script>
+</body>
+</html>

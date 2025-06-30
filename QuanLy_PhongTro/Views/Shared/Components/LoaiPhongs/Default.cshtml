@@ -1,0 +1,15 @@
+﻿@model IEnumerable<QuanLy_PhongTro.Models.LoaiPhongModel>
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var loai in Model)
+    {
+        <label class="filter-option">
+            <input type="checkbox" name="roomType" value="@loai.MaLoaiPhong"> @loai.TenLoaiPhong
+        </label>
+    }
+}
+else
+{
+    <p>Không có dữ liệu loại phòng.</p>
+}

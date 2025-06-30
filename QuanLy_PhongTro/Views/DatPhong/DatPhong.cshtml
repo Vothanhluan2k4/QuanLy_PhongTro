@@ -1,0 +1,380 @@
+﻿@model QuanLy_PhongTro.Models.PhongTroModel
+@using QuanLy_PhongTro.Models
+@{
+    ViewData["Title"] = "Đặt phòng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var nguoiDung = ViewData["NguoiDung"] as NguoiDungModel ?? new NguoiDungModel();
+    var today = DateTime.Now.ToString("yyyy-MM-dd");
+}
+
+<link rel="stylesheet" href="~/css/siteChiTietPhong.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<div id="toast-container" class="toast-container"></div>        
+<div class="booking-container">
+    <h2 class="booking-title">Đặt phòng: @Model.TenPhong</h2>
+
+    <!-- Thông tin phòng -->
+    <div class="room-info-booking">
+        <h3>Thông tin phòng</h3>
+        <div class="room-detail-grid">
+            <!-- Cột trái: Thông tin chi tiết -->
+            <div class="room-info-details">
+                <p><strong>Tên phòng:</strong> @Model.TenPhong</p>
+                <p><strong>Địa chỉ:</strong> @Model.DiaChi</p>
+                <p><strong>Giá thuê:</strong> @Model.GiaThue.ToString("N0") VNĐ/tháng</p>
+                <p><strong>Diện tích:</strong> @Model.DienTich m²</p>
+                <p><strong>Loại phòng:</strong> @Model.LoaiPhong?.TenLoaiPhong</p>
+                <p><strong>Tiền điện:</strong> @Model.TienDien.ToString("N0") VNĐ</p>
+                <p><strong>Tiền nước:</strong> @Model.TienNuoc.ToString("N0") VNĐ</p>
+                <div class="amenitiesDP-grid">
+                    @if (Model.PhongTroThietBis != null && Model.PhongTroThietBis.Any())
+                    {
+                        foreach (var tb in Model.PhongTroThietBis)
+                        {
+                            <div class="amenity-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>@tb.ThietBi?.TenThietBi SL:@tb.SoLuong</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>Không có thông tin tiện nghi</p>
+                    }
+                </div>
+                <p><strong>Mô tả:</strong> @Model.MoTa</p>
+            </div>
+
+            <!-- Cột phải: Ảnh đại diện -->
+            <div class="main-image-container">
+                @if (Model.AnhPhongTros != null && Model.AnhPhongTros.Any(a => a.LaAnhDaiDien))
+                {
+                    var anhDaiDien = Model.AnhPhongTros.First(a => a.LaAnhDaiDien);
+                    <img src="@Url.Content("~/asset/" + anhDaiDien.DuongDan)" alt="Ảnh đại diện" id="main-image">
+                }
+                else
+                {
+                    <img src="@Url.Content("~/asset/default-room.jpg")" alt="Ảnh mặc định" id="main-image">
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Form đặt phòng -->
+    <div class="booking-form-section">
+        <h3>Thông tin đặt phòng</h3>
+        <form id="paymentForm" asp-action="DatPhong" asp-controller="DatPhong" method="post">
+            <input type="hidden" name="MaPhong" value="@Model.MaPhong" />
+
+            <!-- Thông tin người dùng (điền sẵn) -->
+            <div class="form-group">
+                <label for="HoTen">Họ tên</label>
+                <input type="text" class="form-control" id="HoTen" name="HoTen" value="@nguoiDung.HoTen" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="Email">Email</label>
+                <input type="email" class="form-control" id="Email" name="Email" value="@nguoiDung.Email" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="SoDienThoai">Số điện thoại</label>
+                <input type="text" class="form-control" id="SoDienThoai" name="SoDienThoai" value="@nguoiDung.SoDienThoai" readonly />
+            </div>
+
+            <!-- Thông tin hợp đồng -->
+            <div class="form-group">
+                <label for="NgayBatDau">Ngày bắt đầu</label>
+                <input type="date" class="form-control" id="NgayBatDau" name="NgayBatDau"
+                       min="@today" required
+                       data-giathue="@Model.GiaThue.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)" />
+            </div>
+
+            <div class="form-group">
+                <label for="NgayKetThuc">Ngày kết thúc</label>
+                <input type="date" class="form-control" id="NgayKetThuc" name="NgayKetThuc" min="@today" required />
+            </div>
+
+            <div class="form-group">
+                <label for="TienCoc">Tiền cọc (VNĐ)</label>
+                <input type="text" class="form-control" id="TienCoc" name="TienCoc" value="" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="GhiChu">Ghi chú</label>
+                <textarea class="form-control" id="GhiChu" name="GhiChu" rows="3" maxlength="2000"></textarea>
+            </div>
+
+            <div class="form-group payment-method-section">
+                <label><strong>Chọn hình thức thanh toán</strong></label>
+                <div class="payment-options">
+                    <div class="payment-option">
+                        <input type="radio" id="cash" name="PaymentMethod" value="AccountPaid" checked/>
+                        <label for="accountpaid">
+                            <img src="~/asset/accountPaid.jpg" alt="AccountPaid" class="payment-logo" />
+                            Thanh bằng tiền tài khoản
+                        </label>
+                    </div>
+                    <div class="payment-option">
+                        <input type="radio" id="vnpay" name="PaymentMethod" value="VNPay"  />
+                        <label for="vnpay">
+                            <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" alt="VNPay" class="payment-logo" />
+                            Thanh toán qua VNPay
+                        </label>
+                    </div>      
+                    <div class="payment-option">
+                        <input type="radio" id="momo" name="PaymentMethod" value="MoMo" />  
+                        <label for="momo">
+                            <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" class="payment-logo" />
+                            Thanh toán qua MoMo
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="Name" value="@nguoiDung.HoTen" />
+            <input type="hidden" name="Amount" id="vnpayAmount" value="" />
+            <input type="hidden" name="OrderDescription" value="đã thanh toán qua VNPay tại Webiste Phòng trọ vui vẻ" />
+            <input type="hidden" name="OrderType" value="other" />
+
+            <input type="hidden" name="Amount" id="momoAmount"value="" />
+            <input type="hidden" name="OrderId" value="@Guid.NewGuid().ToString()"/>
+            <input type="hidden" name="OrderInfo" value="đã thanh toán qua Momo tại Webiste Phòng trọ vui vẻ" />
+            <input type="hidden" name="FullName" value="@nguoiDung.HoTen" />
+            <input type="hidden" name="Email" value="@nguoiDung.Email" />
+            <!-- Nút gửi -->
+            <button type="submit" class="btn-book">Xác nhận đặt phòng</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="insufficientFundsModal" class="modal1">
+    <div class="modal-content1">
+        <span class="close">&times;</span>
+        <h2>Thông báo</h2>
+        <p id="modal-message"></p>
+        <button id="goToDepositBtn">Nạp tiền ngay</button>
+        <button id="goback">Trở về</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Hàm định dạng ngày
+        function formatDateVN(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Hàm tính tiền cọc (cải tiến)
+        function tinhTienCoc() {
+            console.log("Tính toán tiền cọc..."); // Debug
+
+            const ngayBatDau = document.getElementById('NgayBatDau');
+            const ngayKetThuc = document.getElementById('NgayKetThuc');
+            const tienCocInput = document.getElementById('TienCoc');
+
+            // Lấy giá thuê từ data attribute và chuyển thành số
+            const giaThue = parseFloat(ngayBatDau.dataset.giathue) || 0;
+            console.log("Giá thuê:", giaThue); // Debug
+
+            // Kiểm tra ngày hợp lệ
+            if (!ngayBatDau.value || !ngayKetThuc.value) {
+                tienCocInput.value = '';
+                return;
+            }
+
+            const startDate = new Date(ngayBatDau.value);
+            const endDate = new Date(ngayKetThuc.value);
+
+            // Kiểm tra ngày kết thúc > ngày bắt đầu
+            if (endDate <= startDate) {
+                alert(`Ngày kết thúc (${formatDateVN(endDate)}) phải sau ngày bắt đầu (${formatDateVN(startDate)})`);
+                tienCocInput.value = '';
+                return;
+            }
+
+            // Tính toán số tháng
+            const diffTime = endDate - startDate;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            const soThangThue = Math.ceil(diffDays / 30);
+            const tienCoc = Math.round(soThangThue * (giaThue * 0.5));
+
+            console.log(`Số ngày: ${diffDays}, Số tháng: ${soThangThue}, Tiền cọc: ${tienCoc}`); // Debug
+
+            // Hiển thị kết quả
+            tienCocInput.value = tienCoc.toLocaleString('vi-VN');
+            vnpayAmount.value = tienCoc;
+            momoAmount.value = tienCoc;
+
+        }
+        // Hàm hiển thị toast
+        function showToast(message, type = 'success') {
+            console.log('Showing toast:', message, type);
+            const toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                console.error('Toast container not found!');
+                return;
+            }
+            const toast = document.createElement('div');
+            toast.classList.add('toast');
+            toast.classList.add(type === 'success' ? 'toast-success' : 'toast-error');  
+            toast.innerHTML = `
+                        <span class="toast-icon">${type === 'success' ? '✔' : '✖'}</span>
+                        <span class="toast-message">${message}</span>
+                        <span class="toast-close">×</span>
+                    `;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 500);
+            });
+        }
+
+        // Khởi tạo sự kiện
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log("Trang đã tải xong"); // Debug
+
+            const ngayBatDau = document.getElementById('NgayBatDau');
+            const ngayKetThuc = document.getElementById('NgayKetThuc');
+            window.tempData = {
+                successMessage: '@Html.Raw(Json.Serialize(TempData["SuccessMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16))),
+                errorMessage: '@Html.Raw(Json.Serialize(TempData["ErrorMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16)))
+            };
+
+            // Hiển thị toast nếu có thông báo
+            function handleNotification() {
+                const { successMessage, errorMessage } = window.tempData;
+
+                if (successMessage && successMessage !== 'null' && successMessage !== '""') {
+                    showToast(successMessage, 'success');
+                } else if (errorMessage && errorMessage !== 'null' && errorMessage !== '""') {
+                    showToast(errorMessage, 'error');
+                }
+            }
+
+            handleNotification();
+            // Sự kiện khi thay đổi ngày bắt đầu
+            ngayBatDau.addEventListener('change', function () {
+                const today = DateTime.Now.ToString("yyyy-MM-dd");
+                const selectedDate = new Date(this.value);
+
+
+                // Kiểm tra ngày không trong quá khứ
+                if (selectedDate < today) {
+                    alert(`Không được chọn ngày trong quá khứ. Hôm nay là ${formatDateVN(today)}`);
+                    this.value = '';
+                    document.getElementById('TienCoc').value = '';
+                    return;
+                }
+
+                // Đặt ngày kết thúc tối thiểu là ngày bắt đầu + 1 ngày
+                if (this.value) {
+                    const minEndDate = new Date(selectedDate);
+                    minEndDate.setDate(minEndDate.getDate() + 1);
+                    ngayKetThuc.min = minEndDate.toISOString().split('T')[0];
+
+                    // Reset ngày kết thúc nếu không hợp lệ
+                    if (ngayKetThuc.value && new Date(ngayKetThuc.value) < selectedDate) {
+                        ngayKetThuc.value = '';
+                    }
+                }
+
+                tinhTienCoc();
+            });
+
+            // Sự kiện khi thay đổi ngày kết thúc
+            ngayKetThuc.addEventListener('change', tinhTienCoc);
+
+            // Thêm sự kiện input để cập nhật ngay lập tức
+            ngayBatDau.addEventListener('input', tinhTienCoc);
+            ngayKetThuc.addEventListener('input', tinhTienCoc);
+
+            // Tính toán ngay nếu có giá trị sẵn
+            if (ngayBatDau.value && ngayKetThuc.value) {
+                tinhTienCoc();
+            }
+
+
+            //Tiền không đủ
+            const paymentForm = document.getElementById('paymentForm');
+            const modal = document.getElementById('insufficientFundsModal');
+            const modalMessage = document.getElementById('modal-message');
+            const closeModal = document.querySelector('.close');
+            const goToDepositBtn = document.getElementById('goToDepositBtn');
+            const goBackBtn = document.getElementById('goback');
+
+            paymentForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const paymentMethod = document.querySelector('input[name="PaymentMethod"]:checked').value;
+                const formData = new FormData(paymentForm);
+
+                if (paymentMethod === 'AccountPaid') {
+                    // Sử dụng fetch cho AccountPaid
+                    fetch('/DatPhong/DatPhong', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`Lỗi HTTP: ${response.status} - ${response.statusText}`);
+                            }
+                            return response.json();
+                        })
+                        .then(result => {
+                            if (result.success === false && result.error === true) {
+                                const modal = document.getElementById('insufficientFundsModal');
+                                const modalMessage = document.getElementById('modal-message');
+                                modalMessage.textContent = result.message;
+                                modal.style.display = 'block';
+                                sessionStorage.setItem('returnToBillPayment', result.returnToUrl);
+                                sessionStorage.setItem('soTienConThieu', result.soTienConThieu);
+                                document.getElementById('goToDepositBtn').onclick = function () {
+                                    let redirectUrl = result.redirectUrl;
+                                    const separator = redirectUrl.includes('?') ? '&' : '?';
+                                    redirectUrl = `${redirectUrl}${separator}returnToUrl=${encodeURIComponent(result.returnToUrl)}`;
+                                    window.location.href = redirectUrl;
+                                };
+                                document.getElementById('goback').onclick = function () {
+                                    modal.style.display = 'none';
+                                };
+                            } else if (result.success === true) {
+                                window.location.href = result.redirectUrl;
+                            } else {
+                                alert('Đã xảy ra lỗi: ' + (result.message || 'Không xác định'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi:', error);
+                            alert('Đã xảy ra lỗi khi gửi yêu cầu.');
+                        });
+                } else if (paymentMethod === 'MoMo' || paymentMethod === 'VNPay') {
+                    // Gửi form thông thường cho MoMo và VNPay
+                    paymentForm.submit();
+                }
+            });
+
+            closeModal.onclick = function () {
+                modal.style.display = 'none';
+            };
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            };
+    
+        });
+    </script>
+}

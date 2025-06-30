@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng trọ vui vẻ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/siteLayout.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <header class="header">
+        <!-- Nút toggle menu cho mobile -->
+        <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="logo">
+            <a asp-controller="Home" asp-action="Index">
+                <img src="@Url.Content("~/asset/avatar-removebg-preview.png")" alt="Avatar Menu" width="80px" height="80px">
+            </a>
+        </div>
+
+        <nav class="nav-main" id="navMain">
+            <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+            <a asp-controller="PhongTro" asp-action="Index">Phòng trọ</a>
+            <a asp-controller="TinTuc" asp-action="Index">Tin tức</a>
+            @if (User.Identity.IsAuthenticated && Context.Session.GetInt32("MaQuyen") == 1)
+            {
+                <a asp-area="Admin" asp-controller="PhongTro" asp-action="Index">Admin</a>
+            }
+        </nav>
+
+        <nav class="nav-auth" id="navAuth">
+            <a asp-controller="LuuPhong" asp-action="Index">
+                <i class="far fa-bookmark"></i> Lưu
+                
+            </a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="user-menu">
+                    <div class="user-info">
+                        @{
+                            var avatarUrl = !string.IsNullOrEmpty(Context.Session.GetString("AvatarUrl"))
+                            ? Context.Session.GetString("AvatarUrl")
+                            : Url.Content("~/asset/avatarUser/default_avatarUser.png");
+
+                            // Lấy tên từ session nếu có, nếu không thì lấy từ User.Identity.Name
+                            var userName = !string.IsNullOrEmpty(Context.Session.GetString("HoTen"))
+                            ? Context.Session.GetString("HoTen")
+                            : User.Identity.Name;
+                        }
+                        <img src="@avatarUrl"
+                             alt="User Avatar" class="user-avatar"
+                             onerror="this.src='@Url.Content("~/asset/avatarUser/default_avatarUser.png")'">
+                        <span class="user-name">@userName</span>
+                    </div>
+                    <div class="dropdown-menu" style="display: none;">
+                        <a asp-controller="TrangCaNhan" asp-action="Index"><i class="fas fa-user"></i> Trang cá nhân</a>
+                        <a asp-controller="DangNhap" asp-action="DangXuat"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <a class="Register" asp-controller="DangKy" asp-action="Index">Đăng ký</a>
+                <a class="Login" asp-controller="DangNhap" asp-action="Index">Đăng nhập</a>
+            }
+        </nav>
+    </header>
+
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <h2 class="footer-title">THÔNG TIN LIÊN HỆ</h2>
+            <p style="text-align: center; margin-bottom: 30px;">
+                Mọi yêu cầu và hỗ trợ về Phòng trọ vui vẻ, Quý khách vui lòng liên hệ với chúng tôi qua những cách dưới đây!
+            </p>
+
+            <div class="footer-sections">
+                <div class="footer-section">
+                    <h3>Liên hệ</h3>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-map-marker-alt contact-icon"></i>
+                        <span class="contact-text">Đường 100, Phường Tân Phú, Thủ Đức, TP.HCM</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone contact-icon"></i>
+                        <a href="tel:0392574033" class="contact-link">0392574033</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope contact-icon"></i>
+                        <a href="mailto:luandangnhap@gmail.com" class="contact-link">luandangnhap@gmail.com</a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Hotline</h3>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone contact-icon"></i>
+                        <a href="tel:0392574033" class="contact-link">0392574033</a>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Gửi email</h3>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope contact-icon"></i>
+                        <a href="mailto:luandangnhap@gmail.com" class="contact-link">luandangnhap@gmail.com</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-copyright">
+                © Bản quyền và thiết kế thuộc về <strong>Phòng trọ vui vẻ</strong>
+            </div>
+        </div>
+    </footer>
+    @RenderSection("Scripts", required: false)
+    <script src="~/js/siteLayout.js"></script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+﻿body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: white;
+}
+
+.login-container {
+    width: 95%;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    padding: 50px;
+    margin: 0 auto;
+}
+
+.avatar {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 30px;
+}
+
+h2 {
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+    font-size: 32px;
+}
+
+.input-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.input-group {
+    margin-bottom: 30px;
+}
+
+    .input-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 12px;
+        color: #555;
+        font-size: 18px;
+    }
+
+    .input-group input,
+    .password-wrapper input {
+        width: 100%;
+        height: 60px;
+        padding: 15px 25px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 18px;
+        color: #333;
+        background-color: white;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+.input-wrapper,
+.password-wrapper {
+    position: relative;
+}
+
+    .input-wrapper .input-icon,
+    .password-wrapper .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        transform: translateY(-50%);
+        font-size: 20px;
+        color: #777;
+        z-index: 1;
+    }
+
+    /* Đẩy nội dung input ra xa icon */
+    .input-wrapper input,
+    .password-wrapper input {
+        padding-left: 50px;
+    }
+
+
+/* Ẩn nút toggle mật khẩu mặc định của trình duyệt */
+input[type="password"]::-webkit-reveal,
+input[type="password"]::-webkit-caps-lock-indicator,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    right: -9999px !important;
+}
+
+input[type="password"]::-moz-reveal {
+    display: none !important;
+}
+
+input[type="password"]::-ms-reveal {
+    display: none !important;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+    .password-wrapper input {
+        padding-right: 150px; /* Giảm từ 200px xuống 60px cho phù hợp */
+    }
+
+        .input-group input:focus,
+        .password-wrapper input:focus {
+            border-color: #265cfa;
+            box-shadow: 0 0 8px rgba(38, 92, 250, 0.3);
+        }
+
+.toggle-password {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #777;
+    font-size: 24px;
+    z-index: 2;
+}
+
+    .toggle-password:hover {
+        color: #265cfa;
+    }
+
+.login-btn {
+    width: 100%;
+    padding: 18px;
+    background-color: #265cfa;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    transition: background 0.3s;
+    margin-top: 15px;
+}
+
+    .login-btn:hover {
+        background-color: #1a4fc7;
+    }
+
+.forgot-pass {
+    margin-top: 25px;
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+}
+
+    .forgot-pass a {
+        color: #265cfa;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .forgot-pass a:hover {
+            text-decoration: underline;
+        }
+
+.register-text {
+    margin-top: 30px;
+    font-size: 16px;
+    text-align: center;
+    color: #555;
+}
+
+    .register-text a {
+        color: #265cfa;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .register-text a:hover {
+            text-decoration: underline;
+        }
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 30px 0;
+    color: #777;
+    font-size: 16px;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: #ddd;
+}
+
+.divider-text {
+    padding: 0 15px;
+    color: #555;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* Google login button styles */
+.google-login-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 18px;
+    background-color: white;
+    color: #444;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+    .google-login-btn:hover {
+        background-color: #f8f8f8;
+        border-color: #ccc;
+    }
+
+.google-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    object-fit: contain;
+}
+
+.success-message {
+    color: green;
+    background-color: #e6ffe6;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.form-error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 5px;
+    display: block;
+}
+
+.input-error {
+    border: 1px solid red !important;
+}
+
+.error-message {
+    color: red;
+    background-color: #ffe6e6;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000; 
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    margin-bottom: 10px; /* Khoảng cách giữa các toast */
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+    min-width: 250px; 
+}
+
+.toast-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb; 
+}
+
+.toast-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb; 
+}
+
+.toast-icon {
+    margin-right: 10px;
+    font-size: 18px; 
+}
+
+.toast-message {
+    flex-grow: 1;
+    font-size: 14px;
+}
+
+.toast-close {
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+    font-weight: normal; 
+}
+
+.hide {
+    opacity: 0;
+}
+
+.g-recaptcha {
+    margin: 15px 0;
+}
+
+.form-error {
+    color: #dc3545;
+    font-size: 0.9rem;
+    display: block;
+    margin-top: 5px;
+}
+
+
+/**Form Quen MK*/
+#email{
+    width: 500px;
+}
+#otp{
+    width:400px;
+}

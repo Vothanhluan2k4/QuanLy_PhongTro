@@ -1,0 +1,152 @@
+﻿@{
+    ViewData["Title"] = "Đăng Ký Tài Khoản";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/siteDangKy.css">
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-form">
+            <h1 class="register-title">Đăng Ký Tài Khoản</h1>
+
+            <form id="registerForm" class="form-content">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label for="HoTen" class="form-label">Họ và Tên <span class="star_must">(*)</span></label>
+                    <input type="text" id="HoTen" name="HoTen" class="form-input" placeholder="Nhập họ tên đầy đủ" required>
+                    <span id="hoTenError" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="Email" class="form-label">Email <span class="star_must">(*)</span></label>
+                    <input type="email" id="Email" name="Email" class="form-input" placeholder="Nhập địa chỉ email" required>
+                    <span id="emailError" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="SoDienThoai" class="form-label">Số Điện Thoại <span class="star_must">(*)</span></label>
+                    <input type="text" id="SoDienThoai" name="SoDienThoai" class="form-input" placeholder="Nhập số điện thoại" required>
+                    <span id="sdtError" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="MatKhau" class="form-label">Mật Khẩu <span class="star_must">(*)</span></label>
+                    <div class="password-wrapper">
+                        <input type="password" id="MatKhau" name="MatKhau" class="form-input" placeholder="Nhập mật khẩu" required>
+                        <i class="fas fa-eye toggle-password"></i>
+                    </div>
+                    <span id="matKhauError" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="ConfirmPassword" class="form-label">Xác Nhận Mật Khẩu <span class="star_must">(*)</span></label>
+                    <div class="password-wrapper">
+                        <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-input" placeholder="Nhập lại mật khẩu" required>
+                        <i class="fas fa-eye toggle-password"></i>
+                    </div>
+                    <span id="confirmPasswordError" class="form-error"></span>
+                </div>
+
+                <input type="hidden" id="MaQuyen" name="MaQuyen" value="2">
+
+                <button type="submit" class="register-button">Đăng Ký</button>
+                <div class="login-link">
+                    Đã có tài khoản? <a asp-controller="DangNhap" asp-action="Index">Đăng nhập ngay</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Xóa lỗi cũ
+            document.getElementById('hoTenError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('sdtError').textContent = '';
+            document.getElementById('matKhauError').textContent = '';
+            document.getElementById('confirmPasswordError').textContent = '';
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+
+            // Trim dữ liệu trước khi gửi (vẫn tốt)
+            data.HoTen = data.HoTen.trim();
+            data.Email = data.Email.trim();
+            data.SoDienThoai = data.SoDienThoai.trim();
+            data.MatKhau = data.MatKhau.trim();
+            data.ConfirmPassword = data.ConfirmPassword.trim();
+
+            // Chuyển MaQuyen thành số nguyên
+            data.MaQuyen = parseInt(data.MaQuyen);
+
+            try {
+                const response = await fetch('/DangKy/Register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    },
+                    body: JSON.stringify(data) // Gửi đối tượng data chứa các trường của ViewModel
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    window.location.href = '/DangNhap';
+                } else {
+                    alert(result.message); // Thông báo chung
+
+                    // Hiển thị lỗi chi tiết từ đối tượng errors trả về
+                    if (result.errors) {
+                        console.log("Validation errors:", result.errors);
+                        for (const fieldName in result.errors) {
+                            const errorMessages = result.errors[fieldName];
+                            if (errorMessages && errorMessages.length > 0) {
+                                let errorElementId = '';
+                                // Map tên trường từ ViewModel sang ID của thẻ span lỗi
+                                switch (fieldName) {
+                                    case 'HoTen': errorElementId = 'hoTenError'; break;
+                                    case 'Email': errorElementId = 'emailError'; break;
+                                    case 'SoDienThoai': errorElementId = 'sdtError'; break;
+                                    case 'MatKhau': errorElementId = 'matKhauError'; break;
+                                    case 'ConfirmPassword': errorElementId = 'confirmPasswordError'; break;
+                                }
+                                const errorElement = document.getElementById(errorElementId);
+                                if (errorElement) {
+                                    errorElement.textContent = errorMessages[0]; // Hiển thị lỗi đầu tiên
+                                }
+                            }
+                        }
+                    }
+                    // Dự phòng nếu không có errors object chi tiết
+                    else if (result.message.includes("Mật khẩu xác nhận")) {
+                        document.getElementById('confirmPasswordError').textContent = result.message;
+                    } // Thêm các else if khác nếu cần
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Đã có lỗi xảy ra khi đăng ký.');
+            }
+        });
+
+        // Toggle password visibility (giữ nguyên code cũ)
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', function () {
+                const input = this.previousElementSibling;
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+</script>
+</body>
+</html>

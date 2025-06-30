@@ -1,0 +1,41 @@
+﻿@model dynamic
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thanh toán thành công</title>
+    <link href="~/css/sitePaymentSuccess.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="toast-container" class="toast-container"></div>
+    <div class="container">
+        <div class="success-message">Thanh toán thành công!</div>
+
+        <div class="payment-info">
+            <p><strong>Mã đơn hàng:</strong> @Model.OrderId</p>
+            <p><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+            <p><strong>Mô tả đơn hàng:</strong> @Model.OrderInfo</p>
+            @if (Model.TransactionId != null && !string.IsNullOrEmpty(Model.TransactionId.ToString()))
+            {
+                <p><strong>Mã giao dịch:</strong> @Model.TransactionId</p>
+            }
+            @if (Model.Amount is double && (double)Model.Amount > 0) 
+            {
+                <p><strong>Tổng tiền:</strong> @(((double)Model.Amount).ToString("N0")) VNĐ</p>
+            }
+            <p><strong>Thời gian:</strong> @(((DateTime)Model.CreatedDate).ToString("dd/MM/yyyy HH:mm:ss"))</p>
+        </div>
+
+        <div>
+            <a href="@Url.Action("ChiTietPhong", "PhongTro", new { id = Model.MaPhong })" class="btn btn-primary">Quay về phòng trọ</a>
+            <a href="@Url.Action("Index", "TrangCaNhan", new { tab = "balance-info" })" class="btn btn-secondary">Kiểm tra lịch sử thanh toán</a>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    window.tempData = {
+        successMessage: '@Html.Raw(Json.Serialize(TempData["SuccessMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16))),
+        errorMessage: '@Html.Raw(Json.Serialize(TempData["ErrorMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16)))
+    };
+</script>

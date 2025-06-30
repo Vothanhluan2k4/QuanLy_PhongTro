@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết tin tức - @Model.TieuDe</title>
+    <link href="~/css/siteChiTietTinTuc.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="page-container">
+        <div class="content-wrapper">
+            <div class="detail-container">
+                <!-- Main Content (Chi tiết tin tức) -->
+                <div class="main-content">
+                    <h1>@Model.TieuDe</h1>
+                    <div class="news-meta">
+                        <span class="news-category">@Model.LoaiTinTuc?.TenLoaiTinTuc  </span>
+                        <span>Ngày đăng: @Model.NgayDang.ToString("dd/MM/yyyy")</span> |
+                        <span>Lượt xem: @Model.LuotXem</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.DuongDanHinhAnh))
+                    {
+                        <img src="/asset/@Model.DuongDanHinhAnh" alt="@Model.TieuDe" class="news-image">
+                    }
+                    else
+                    {
+                        <img src="https://via.placeholder.com/800x400" alt="Hình ảnh mặc định" class="news-image">
+                    }
+                    
+                    <!-- THAY ĐỔI QUAN TRỌNG: Sử dụng class news-content với định dạng tự động -->
+                    <div class="news-content" id="newsContent">@Model.MoTa</div>
+                </div>
+                
+                <!-- Right Sidebar (Tin tức theo lượt xem) -->
+                <div class="right-sidebar">
+                    <h3>Tin tức nổi bật theo lượt xem</h3>
+                    @if (ViewBag.TopViewedNews != null && ((IEnumerable<TinTucModel>)ViewBag.TopViewedNews).Any())
+                    {
+                        foreach (var item in ViewBag.TopViewedNews)
+                        {
+                            <div class="top-viewed-item">
+                                <h4><a href="@Url.Action("Detail", "TinTuc", new { id = item.MaTinTuc })">@item.TieuDe</a></h4>
+                                <div class="views">Lượt xem: @item.LuotXem</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>Không có tin tức nào để hiển thị.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Xử lý click tin tức
+        document.querySelectorAll('.top-viewed-item a').forEach(item => {
+            item.addEventListener('click', function (e) {
+                console.log('Detail item clicked:', this.textContent);
+                // Logic đã được xử lý bởi Razor qua Url.Action
+            });
+        });
+
+        // Xử lý định dạng nội dung - in đậm các dòng bắt đầu bằng số
+        document.addEventListener('DOMContentLoaded', function() {
+            const newsContent = document.getElementById('newsContent');
+            if (newsContent) {
+                let content = newsContent.textContent || newsContent.innerText;
+                
+                // Chia nội dung thành các dòng
+                let lines = content.split('\n');
+                let formattedLines = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim();
+                    
+                    // Bỏ qua dòng trống
+                    if (line === '') {
+                        continue;
+                    }
+                    
+                    // Kiểm tra nếu dòng bắt đầu bằng số (1., 2., 3., etc.)
+                    if (/^\d+(\.\d+)*\.\s/.test(line)) {
+                        formattedLines.push('<strong>' + line + '</strong>');
+                    } else {
+                        formattedLines.push('<p>' + line + '</p>');
+                    }
+                }
+                
+                // Cập nhật nội dung với định dạng mới
+                newsContent.innerHTML = formattedLines.join('');
+            }
+        });
+    </script>
+</body>
+</html>

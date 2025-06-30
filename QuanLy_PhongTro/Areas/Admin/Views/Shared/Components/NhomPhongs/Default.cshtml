@@ -1,0 +1,116 @@
+﻿@model IEnumerable<IGrouping<LoaiPhongModel, PhongTroModel>>
+
+@foreach (var nhom in Model)
+{
+    <div class="building-section">
+        <div class="building-info">
+            <h1>@nhom.Key.TenLoaiPhong</h1>
+        </div>
+
+        <div class="room-list">
+            @foreach (var item in nhom)
+            {
+                <div class="room-card" onclick="viewRoomDetail('@item.MaPhong')">
+                    <div class="save-icon" onclick="toggleSave(event, '@item.MaPhong')">
+                        <i class="far fa-bookmark"></i>
+                    </div>
+
+                    <!-- Hiển thị ảnh đại diện -->
+                    @if (item.AnhPhongTros != null && item.AnhPhongTros.Any(a => a.LaAnhDaiDien))
+                    {
+                        <img src="~/asset/@item.AnhPhongTros.First(a => a.LaAnhDaiDien).DuongDan" alt="@item.TenPhong" class="room-image">
+                    }
+                    else
+                    {
+                        <img src="~/asset/default-room.jpg" alt="@item.TenPhong" class="room-image">
+                    }
+
+                    <div class="room-content">
+                        <div class="room-header">
+                            <h2>@item.TenPhong - @item.DiaChi</h2>
+                        </div>
+                        <div class="room-price-area">
+                            <span class="price">@item.GiaThue.ToString("N0") VNĐ</span>
+                            <span class="area">@item.DienTich m²</span>
+                        </div>
+                        <div class="room-features">
+                            @if (item.MaLoaiPhong == 1)
+                            {
+                                <span><i class="fas fa-home"></i> Phòng trọ</span>
+                            }
+                            else
+                            {
+                                <span><i class="fas fa-building"></i> Nguyên căn</span>
+                            }
+
+                            @if (item.PhongTroThietBis != null)
+                            {
+                                @foreach (var tb in item.PhongTroThietBis.Take(3))
+                                {
+                                    <span><i class="fas fa-check"></i> @tb.ThietBi?.TenThietBi</span>
+                                }
+                            }
+                        </div>
+                        <div class="room-divider"></div>
+                        <div class="room-poster">
+                            <span class="poster-name">Quản lý</span>
+                            <span class="room-status @(item.TrangThai == "Trống" ? "available" : "rented")">
+                                @item.TrangThai
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="pagination-container">
+                <div class="pagination">
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })" class="page-nav">
+                            &laquo; Trước
+                        </a>
+                    }
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <a href="@Url.Action("Index", new { page = i })"
+                           class="@(i == ViewBag.CurrentPage ? "page-number active" : "page-number")">
+                            @i
+                        </a>
+                    }
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })" class="page-nav">
+                            Sau &raquo;
+                        </a>
+                    }
+                </div>
+                <div class="pagination-info">
+                    Hiển thị @((ViewBag.CurrentPage - 1) * 6 + 1)-@Math.Min(ViewBag.CurrentPage * 6, ViewBag.TotalItems)
+                    trong tổng số @ViewBag.TotalItems phòng
+                </div>
+            </div>
+        }
+        
+    </div>
+    
+ }
+
+@section Scripts {
+    <script>
+        // Xử lý click phòng
+        function viewRoomDetail(maPhong) {
+            window.location.href = '/PhongTro/Detail/' + maPhong;
+        }
+
+        // Xử lý bookmark
+        function toggleSave(event, maPhong) {
+            event.stopPropagation();
+            // Gọi API để lưu/ bỏ lưu phòng
+            console.log('Toggle save for room:', maPhong);
+        }
+    </script>
+}

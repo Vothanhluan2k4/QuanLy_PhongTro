@@ -1,0 +1,183 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Thanh toán hóa đơn";
+    var maHoaDon = ViewBag.MaHoaDon;
+    var tongTien = ViewBag.TongTien ?? 0; // Giá trị mặc định nếu null
+    var nguoiDung = ViewBag.NguoiDung ?? new { HoTen = "Khách hàng", Email = "email@example.com" };
+    var tenPhong = ViewBag.TenPhong;
+}
+<link rel="stylesheet" href="~/css/billpay.css"/>
+<div id="toast-container" class="toast-container"></div>
+<div class="payment-container">
+    <h3>Thanh toán hóa đơn #@maHoaDon</h3>
+    <p class="maPhong">Số phòng: @tenPhong</p>
+    <p class="payment-amount">Số tiền: @tongTien.ToString("N0") VNĐ</p>
+    <form id="paymentForm" asp-action="PayBill" asp-controller="PayBill" method="post">
+        <input type="hidden" name="maHoaDon" value="@maHoaDon" />
+        <input type="hidden" name="soTien" value="@tongTien" />
+        <div class="form-group payment-method-section">
+            <label><strong>Chọn hình thức thanh toán</strong></label>
+            <div class="payment-options">
+                <div class="payment-option">
+                    <input type="radio" id="accountpaid" name="PaymentMethod" value="AccountPaid" checked />
+                    <label for="accountpaid">
+                        <img src="~/asset/accountPaid.jpg" alt="AccountPaid" class="payment-logo" />
+                        Thanh toán bằng tiền tài khoản
+                    </label>
+                </div>
+                <div class="payment-option">
+                    <input type="radio" id="vnpay" name="PaymentMethod" value="VNPay" />
+                    <label for="vnpay">
+                        <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" alt="VNPay" class="payment-logo" />
+                        Thanh toán qua VNPay
+                    </label>
+                </div>
+                <div class="payment-option">
+                    <input type="radio" id="momo" name="PaymentMethod" value="MoMo" />
+                    <label for="momo">
+                        <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" class="payment-logo" />
+                        Thanh toán qua MoMo
+                    </label>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="Name" value="@nguoiDung.HoTen" />
+        <input type="hidden" name="Amount" id="paymentAmount" value="@tongTien" />
+        <input type="hidden" name="OrderDescription" value="Thanh toán hóa đơn #@maHoaDon tại Website Phòng trọ vui vẻ" />
+        <input type="hidden" name="OrderType" value="billpayment" />
+        <input type="hidden" name="OrderId" value="@Guid.NewGuid().ToString()" />
+        <input type="hidden" name="FullName" value="@nguoiDung.HoTen" />
+        <input type="hidden" name="Email" value="@nguoiDung.Email" />
+        <div class="form-buttons">
+            <button type="submit" class="btn-submit">Xác nhận thanh toán</button>
+            <a href="@Url.Action("Index", "TrangCaNhan", new { tab = "days-receipt" })" class="btn-cancel">Quay về</a>
+        </div>
+    </form>
+    <!--
+    -->
+</div>
+
+<!-- Modal -->
+<div id="insufficientFundsModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Thông báo</h2>
+        <p id="modal-message"></p>
+        <button id="goToDepositBtn">Nạp tiền ngay</button>
+        <button id="goback">Trở về</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function () {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    paymentOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+
+            const paymentForm = document.getElementById('paymentForm');
+            const modal = document.getElementById('insufficientFundsModal');
+            const modalMessage = document.getElementById('modal-message');
+            const closeModal = document.querySelector('.close');
+            const goToDepositBtn = document.getElementById('goToDepositBtn');
+            const goBackBtn = document.getElementById('goback');
+
+            paymentForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const formData = new FormData(paymentForm);
+                const maHoaDon = formData.get('maHoaDon');
+                const paymentMethod = formData.get('PaymentMethod');
+                if (!paymentMethod) {
+                    showToast('Vui lòng chọn một phương thức thanh toán', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/PayBill/PayBill', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    if (!response.ok) throw new Error(`Lỗi HTTP: ${response.status}`);
+                    const result = await response.json();
+                    if (result.redirect) {
+                        showToast(result.message || 'Đang chuyển hướng...', 'info');
+                        setTimeout(() => window.location.href = result.redirect, 1000);
+                    } else if (result.success === false && result.error === true) {
+                        modalMessage.textContent = result.message;
+                        modal.style.display = 'block';
+                        sessionStorage.setItem('returnToBillPayment', result.returnToUrl);
+                        sessionStorage.setItem('soTienConThieu', result.soTienConThieu);
+                        goToDepositBtn.onclick = () => window.location.href = result.redirectUrl;
+                        goBackBtn.onclick = () => modal.style.display = 'none';
+                    } else if (result.success === true) {
+                        showToast(result.message || 'Thanh toán thành công!', 'success');
+                        setTimeout(() => window.location.href = result.redirectUrl, 2000);
+                    } else {
+                        showToast(result.message || 'Lỗi không xác định', 'error');
+                        setTimeout(() => window.location.href = result.redirectUrl, 2000);
+                    }
+                } catch (error) {
+                    showToast(`Lỗi: ${error.message}`, 'error');
+                    setTimeout(() => window.location.href = '@Url.Action("Index", "TrangCaNhan", new { tab = "days-receipt" })', 2000);
+                }
+            });
+
+            const successMessage = '@Html.Raw(Json.Serialize(TempData["SuccessMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16)));
+            const errorMessage = '@Html.Raw(Json.Serialize(TempData["ErrorMessage"]))'.replace(/\\u[0-9a-fA-F]{4}/g, match => String.fromCharCode(parseInt(match.replace(/\\u/, ''), 16)));
+            console.log('Success Message:', successMessage);
+            console.log('Error Message:', errorMessage);
+            if (successMessage && successMessage !== 'null' && successMessage !== '""') {
+                showToast(successMessage, 'success');
+                fetch('/PayBill/ClearTempData', { method: 'POST' });
+            } else if (errorMessage && errorMessage !== 'null' && errorMessage !== '""') {
+                showToast(errorMessage, 'error');
+                fetch('/PayBill/ClearTempData', { method: 'POST' });
+            }
+
+            closeModal.onclick = () => modal.style.display = 'none';
+            window.onclick = (event) => {
+                if (event.target == modal) modal.style.display = 'none';
+            };
+
+            function showToast(message, type = 'success') {
+                const toastContainer = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.classList.add('toast');
+
+                // Đặt toast ở góc trên bên phải
+                toast.style.position = 'fixed';
+                toast.style.top = '20px';
+                toast.style.right = '20px';
+                toast.style.zIndex = '1000';
+
+                if (type === 'success') {
+                    toast.classList.add('toast-success');
+                    toast.innerHTML = `<span class="toast-icon">✔</span><span class="toast-message">${message}</span><span class="toast-close">×</span>`;
+                } else if (type === 'error') {
+                    toast.classList.add('toast-error');
+                    toast.innerHTML = `<span class="toast-icon">✖</span><span class="toast-message">${message}</span><span class="toast-close">×</span>`;
+                } else if (type === 'info') {
+                    toast.classList.add('toast-info');
+                    toast.innerHTML = `<span class="toast-icon">ℹ</span><span class="toast-message">${message}</span><span class="toast-close">×</span>`;
+                }
+
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 500);
+                }, 3000);
+
+                toast.querySelector('.toast-close').addEventListener('click', () => {
+                    toast.classList.add('hide');
+                    setTimeout(() => toast.remove(), 500);
+                });
+            }
+        });
+    </script>
+}

@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt lại mật khẩu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/css/siteDangNhap.css">
+</head>
+<body>
+    <div class="login-container">
+        <img src="~/asset/avatar.png" class="avatar" alt="Avatar">
+        <h2>Đặt lại mật khẩu</h2>
+
+        <div id="successMessage" class="success-message" style="display: none;"></div>
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <form id="resetPasswordForm">
+            <div class="input-group">
+                <label for="newPassword">Mật khẩu mới</label>
+                <div class="password-wrapper">
+                    <input type="password" id="newPassword" name="newPassword" placeholder="Nhập mật khẩu mới" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility('newPassword', this)">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <span id="passwordError" class="form-error"></span>
+            </div>
+
+            <div class="input-group">
+                <label for="confirmPassword">Nhập lại mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility('confirmPassword', this)">
+                        <i class="fas fa-eye"></i>
+                    </span>
+                </div>
+                <span id="confirmPasswordError" class="form-error"></span>
+            </div>
+
+            <button type="submit" id="submitButton" class="login-btn">Đặt lại mật khẩu</button>
+
+            <p class="register-text">
+                Quay lại <a asp-controller="DangNhap" asp-action="Index">Đăng nhập</a>
+            </p>
+        </form>
+    </div>
+
+    <script>
+        // Hàm chung để hiển thị/ẩn mật khẩu
+        function togglePasswordVisibility(inputId, toggleElement) {
+            const input = document.getElementById(inputId);
+            const icon = toggleElement.querySelector('i');
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+
+            input.setAttribute('type', type);
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
+            const submitButton = document.getElementById('submitButton');
+            const newPasswordInput = document.getElementById('newPassword');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const passwordError = document.getElementById('passwordError');
+            const confirmPasswordError = document.getElementById('confirmPasswordError');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+
+            resetPasswordForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                // Reset error messages
+                passwordError.textContent = '';
+                confirmPasswordError.textContent = '';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                newPasswordInput.classList.remove('input-error');
+                confirmPasswordInput.classList.remove('input-error');
+
+                // Validate form
+                const newPassword = newPasswordInput.value.trim();
+                const confirmPassword = confirmPasswordInput.value.trim();
+                let isValid = true;
+
+                if (!newPassword) {
+                    passwordError.textContent = 'Vui lòng nhập mật khẩu mới';
+                    newPasswordInput.classList.add('input-error');
+                    isValid = false;
+                } else if (newPassword.length < 6) {
+                    passwordError.textContent = 'Mật khẩu phải có ít nhất 6 ký tự';
+                    newPasswordInput.classList.add('input-error');
+                    isValid = false;
+                }
+
+                if (!confirmPassword) {
+                    confirmPasswordError.textContent = 'Vui lòng nhập lại mật khẩu';
+                    confirmPasswordInput.classList.add('input-error');
+                    isValid = false;
+                }
+
+                if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+                    confirmPasswordError.textContent = 'Mật khẩu không khớp';
+                    confirmPasswordInput.classList.add('input-error');
+                    isValid = false;
+                }
+
+                if (!isValid) return;
+
+                submitButton.disabled = true;
+                submitButton.textContent = 'Đang xử lý...';
+
+                try {
+                    const response = await fetch('/QuenMatKhau/DatLaiMatKhau', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ newPassword: newPassword })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        successMessage.textContent = result.message;
+                        successMessage.style.display = 'block';
+
+                        // Chuyển hướng sau 2 giây
+                        setTimeout(() => {
+                            window.location.href = result.redirectUrl || '/DangNhap';
+                        }, 2000);
+                    } else {
+                        errorMessage.textContent = result.message;
+                        errorMessage.style.display = 'block';
+                    }
+                } catch (error) {
+                    errorMessage.textContent = 'Lỗi kết nối đến máy chủ';
+                    errorMessage.style.display = 'block';
+                    console.error('Error:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Đặt lại mật khẩu';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
