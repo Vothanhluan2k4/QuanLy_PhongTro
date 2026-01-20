@@ -29,9 +29,22 @@ document.addEventListener('DOMContentLoaded', function () {
         let selectedIssueTypeValue = '';
         let filesArray = []; // Lưu trữ danh sách file
 
-        // Xử lý preview file
+        // Thêm validation cho file size (40MB limit)
+        const MAX_FILE_SIZE = 40 * 1024 * 1024; // 40MB in bytes
+
         mediaInput.addEventListener('change', function () {
             const files = Array.from(this.files);
+            
+            // Kiểm tra kích thước file
+            for (const file of files) {
+                if (file.size > MAX_FILE_SIZE) {
+                    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                    showToast(`File '${file.name}' có kích thước ${fileSizeMB}MB vượt quá giới hạn 40MB. Vui lòng chọn file nhỏ hơn.`, 'error');
+                    this.value = ''; // Clear input
+                    return;
+                }
+            }
+            
             files.forEach(file => {
                 if (!filesArray.some(existingFile => existingFile.name === file.name && existingFile.size === file.size)) {
                     filesArray.push(file);

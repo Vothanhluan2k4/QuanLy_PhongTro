@@ -679,6 +679,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let tienCoc = document.getElementById('hopdong-tiencoc').value;
         const trangThai = document.getElementById('hopdong-trangthai').value;
         const phuongThucThanhToan = document.getElementById('hopdong-phuongthuc-thanhtoan').value;
+        const ghiChu = document.getElementById('hopdong-ghichu').value;
         const hopDongId = document.getElementById('hopdong-id').value;
 
         if (!maPhong) {
@@ -707,6 +708,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (!phuongThucThanhToan) {
             showToast('Vui lòng chọn phương thức thanh toán.', false);
+            return;
+        }
+        if (!ghiChu) {
+            showToast('Vui lòng ghi nội dung ghi chú', false);
             return;
         }
 

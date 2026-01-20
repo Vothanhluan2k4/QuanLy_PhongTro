@@ -201,6 +201,14 @@ public async Task<IActionResult> GetAll(string search = "", int pageNumber = 1, 
                 {
                     return Json(new { success = false, message = "Phương thức thanh toán không được để trống." });
                 }
+                if (string.IsNullOrEmpty(viewModel.PhuongThucThanhToan))
+                {
+                    return Json(new { success = false, message = "Phương thức thanh toán không được để trống." });
+                }
+                if(string.IsNullOrEmpty(viewModel.GhiChu))
+                {
+                    return Json(new { success = false, message = "Ghi chú không được để trống" });
+                }    
 
                 // Kiểm tra người dùng dựa trên UserInputType
                 if (viewModel.UserInputType == "existing")
@@ -259,6 +267,8 @@ public async Task<IActionResult> GetAll(string search = "", int pageNumber = 1, 
                 {
                     return Json(new { success = false, message = "Phòng đã được thuê hoặc không ở trạng thái còn trống." });
                 }
+                
+
 
                 var hopDong = new HopDongModel
                 {
@@ -269,7 +279,7 @@ public async Task<IActionResult> GetAll(string search = "", int pageNumber = 1, 
                     TienCoc = viewModel.TienCoc,
                     TrangThai = viewModel.TrangThai,
                     NgayKy = viewModel.NgayKy,
-                    GhiChu = viewModel.GhiChu,
+                    GhiChu = viewModel.GhiChu ,
                     PhuongThucThanhToan = viewModel.PhuongThucThanhToan
                 };
 
@@ -277,6 +287,7 @@ public async Task<IActionResult> GetAll(string search = "", int pageNumber = 1, 
                 {
                     try
                     {
+                        
                         phong.TrangThai = "Đã thuê";
                         _context.PhongTros.Update(phong);
                         _context.HopDongs.Add(hopDong);

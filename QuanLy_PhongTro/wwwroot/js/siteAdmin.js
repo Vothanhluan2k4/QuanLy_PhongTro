@@ -28,7 +28,7 @@
         equipmentListBody: document.getElementById('equipment-list-body'),
         searchRoomInput: document.getElementById('search-room-input'),
         searchRoomBtn: document.getElementById('search-room-btn'),
-        resetSearchBtn: document.getElementById('reset-search-btn'), // Thêm nút reset
+        resetSearchBtn: document.getElementById('reset-search-btn'), 
         roomListBody: document.querySelector('.room-list-section .table tbody'),
         //User
         userModal: document.getElementById('user-modal'),
@@ -1798,7 +1798,7 @@ async function loadProvinces() {
         const response = await fetch('https://provinces.open-api.vn/api/p/');
         const provinces = await response.json();
         const provinceSelect = document.getElementById('province');
-        provinceSelect.innerHTML = '<option value="">Chọn Tỉnh/Thành phố</option>'; // Reset dropdown
+        provinceSelect.innerHTML = '<option value="">Chọn Tỉnh/Thành phố</option>'; 
         provinces.forEach(province => {
             const option = document.createElement('option');
             option.value = province.code;

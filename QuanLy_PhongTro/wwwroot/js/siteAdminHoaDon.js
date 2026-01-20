@@ -474,6 +474,8 @@
             formData.set('Thang', parseInt(thang));
             formData.set('Nam', parseInt(nam));
         }
+
+
         // Thêm các giá trị chỉ số vào formData
         const chiSoDienCu = parseFloat(hoadonChiSoDienCuInput.value) || 0;
         const chiSoDienMoi = parseFloat(hoadonChiSoDienMoiInput.value) || 0;

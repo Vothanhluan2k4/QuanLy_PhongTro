@@ -1221,7 +1221,7 @@ footer {
     background: linear-gradient(135deg, #f0f4f8, #ffffff); /* Gradient nền hiện đại */
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Bóng hiện đại */
-    margin-top: 0;
+    margin-top: -40px;
     border: 1px solid #e6ecef;
 }
 
@@ -1357,75 +1357,131 @@ footer {
 
 .show-revenue {
     display: flex;
-    flex-wrap: nowrap; /* Ngăn flex wrap để giữ 3 phần liền nhau */
-    justify-content: space-between; /* Phân bố đều khoảng cách giữa các phần tử */
-    margin-top: 0;
-    padding: 10px;
-    background: linear-gradient(135deg, #f0f4f8, #e9ecef); /* Giữ gradient nền */
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Đảm bảo chiếm toàn bộ chiều rộng cha */
-    max-width: 1000px; /* Giới hạn chiều rộng để tránh quá dài */
-    margin: 0 auto; /* Căn giữa */
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin: 30px 0;
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .revenue-item {
-    flex: 1; /* Phân chia đều không gian */
-    min-width: 0; /* Ngăn phần tử co lại quá mức */
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px; /* Giảm khoảng cách giữa label và input */
-    background: linear-gradient(145deg, #ffffff, #f9e1e1); /* Giữ gradient hồng */
-    padding: 15px;
-    border-radius: 10px;
+    gap: 15px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 25px 20px;
+    border-radius: 20px;
     text-align: center;
-    border: 1px solid #ffb6b6;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    margin: 0 5px; /* Thêm margin nhẹ giữa các phần tử */
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.revenue-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(145deg, #ffe6e6, #fff5f5);
-}
+    .revenue-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .revenue-item:nth-child(1)::before {
+        background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    }
+
+    .revenue-item:nth-child(2)::before {
+        background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+    }
+
+    .revenue-item:nth-child(3)::before {
+        background: linear-gradient(90deg, #06b6d4, #0891b2);
+    }
+
+    .revenue-item:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    }
 
 .revenue-label {
-    font-size: 18px;
-    font-weight: 600;
-    color: #c0392b;
+    font-size: 16px;
+    font-weight: 700;
+    color: #475569;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 
-.revenue-label::before {
-    content: "\f201"; /* Icon biểu đồ */
+.revenue-item:nth-child(1) .revenue-label::before {
+    content: "\f007";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    margin-right: 8px;
-    color: #e74c3c;
+    color: #3b82f6;
+    font-size: 18px;
+}
+
+.revenue-item:nth-child(2) .revenue-label::before {
+    content: "\f236";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: #8b5cf6;
+    font-size: 18px;
+}
+
+.revenue-item:nth-child(3) .revenue-label::before {
+    content: "\f15c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    color: #06b6d4;
+    font-size: 18px;
 }
 
 .revenue-input {
     width: 100%;
-    padding: 10px;
+    padding: 15px;
     border: none;
-    background-color: transparent;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
     text-align: center;
-    font-size: 24px;
-    font-weight: 700;
-    color: #e74c3c;
-    border-bottom: 2px solid #e74c3c;
+    font-size: 32px;
+    font-weight: 800;
+    color: #1e293b;
+    border-radius: 12px;
     transition: all 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.revenue-item:nth-child(1) .revenue-input {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%);
+    color: #1d4ed8;
+}
+
+.revenue-item:nth-child(2) .revenue-input {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%);
+    color: #7c3aed;
+}
+
+.revenue-item:nth-child(3) .revenue-input {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1) 0%, rgba(8, 145, 178, 0.05) 100%);
+    color: #0891b2;
 }
 
 .revenue-input:focus {
     outline: none;
-    border-bottom: 2px solid #c0392b;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    transform: scale(1.02);
 }
 .charts-container {
     display: flex;
