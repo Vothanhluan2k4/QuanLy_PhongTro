@@ -69,4 +69,4 @@ QuanLy_PhongTro/
 ```
 
 ## Tác Giả
-- Võ Thanh Luận
+- Võ Thành Luận
