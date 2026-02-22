@@ -2,6 +2,8 @@
 
 Ứng dụng quản lý phòng trọ trực tuyến, hỗ trợ chủ trọ và người thuê trong việc quản lý phòng, hợp đồng, hóa đơn và thanh toán.
 
+---
+
 ## Công Nghệ Sử Dụng
 
 ### Backend
@@ -26,6 +28,8 @@
 - reCAPTCHA – Bảo mật
 - X.PagedList – Phân trang
 
+---
+
 ## Chức Năng Chính
 
 ### Người Dùng
@@ -47,24 +51,34 @@
 - Thống kê doanh thu
 - Báo cáo bằng biểu đồ (cột, tròn)
 
-## Cấu Trúc Dự Án
-QuanLy_PhongTro/
-+-- Areas/
-|   +-- Admin/              # Khu vực quản trị
-|       +-- Controllers/    # Controllers admin
-|       +-- Views/          # Views admin
-+-- Controllers/            # Controllers chính
-+-- Models/                 # Các model
-+-- Repository/             # Data context
-+-- Services/               # Các dịch vụ (Email, Payment)
-+-- ViewModel/              # View models
-+-- Views/                  # Views người dùng
-+-- wwwroot/                # Static files
-|   +-- css/               # Style sheets
-|   +-- js/                # JavaScript files
-|   +-- asset/             # Hình ảnh, media
-+-- Migrations/             # Database migrations
+---
 
+## Cấu Trúc Dự Án
+
+```bash
+QuanLy_PhongTro/
+│
+├── Areas/
+│   └── Admin/                 # Khu vực quản trị
+│       ├── Controllers/       # Controllers admin
+│       └── Views/             # Views admin
+│
+├── Controllers/               # Controllers chính
+├── Models/                    # Các model
+├── Repository/                # Data context
+├── Services/                  # Các dịch vụ (Email, Payment)
+├── ViewModel/                 # View models
+├── Views/                     # Views người dùng
+│
+├── wwwroot/                   # Static files
+│   ├── css/                   # Style sheets
+│   ├── js/                    # JavaScript files
+│   └── asset/                 # Hình ảnh, media
+│
+└── Migrations/                # Database migrations
+```
+
+---
 
 ## Tác Giả
 - Võ Thành Luận
