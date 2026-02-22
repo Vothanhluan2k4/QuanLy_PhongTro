@@ -1,4 +1,4 @@
-﻿/* ===== RESET & BASE STYLES ===== */
+/* ===== RESET & BASE STYLES ===== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -177,6 +177,25 @@ body {
 }
 
 /* ===== PROFILE SECTION ===== */
+/* Validation: Data Annotations hiển thị từ server */
+.validation-summary {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background-color: #fdecea;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+}
+
+.profile-container .form-error,
+.profile-container .text-danger {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+}
+
 .profile-container {
     max-width: 700px;
     margin: 0 auto;

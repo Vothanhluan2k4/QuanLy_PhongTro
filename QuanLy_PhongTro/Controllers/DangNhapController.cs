@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using QuanLy_PhongTro.Repository;
 using QuanLy_PhongTro.Models;
 using Microsoft.AspNetCore.Authentication;
@@ -37,7 +37,23 @@ namespace QuanLy_PhongTro.Controllers
         [IgnoreAntiforgeryToken] // Tạm bỏ xác thực để xử lý từ fetch
         public async Task<IActionResult> XuLyDangNhap([FromBody] DangNhapRequest model)
         {
-            if(string.IsNullOrEmpty(model.Captcha))
+            // Hiển thị lỗi Data Annotations (Required, EmailAddress, ...) lên frontend
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors?.Count > 0)
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => (kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()) ?? Array.Empty<string>()
+                    );
+                var firstError = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault() ?? "Dữ liệu không hợp lệ.";
+                return Json(new { success = false, message = firstError, errors });
+            }
+
+            if (string.IsNullOrEmpty(model?.Captcha))
             {
                 return Json(new { success = false, message = "Invalid captcha" });
             }

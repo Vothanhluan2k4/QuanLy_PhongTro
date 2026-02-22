@@ -1,4 +1,4 @@
-﻿/* Ẩn nút toggle mật khẩu mặc định của trình duyệt */
+/* Ẩn nút toggle mật khẩu mặc định của trình duyệt */
 input[type="password"]::-webkit-reveal,
 input[type="password"]::-webkit-caps-lock-indicator,
 input[type="password"]::-webkit-credentials-auto-fill-button {
@@ -105,6 +105,16 @@ input[type="password"]::-ms-reveal {
     .toggle-password:hover {
         color: #3498db;
     }
+
+.validation-summary {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-bottom: 12px;
+    padding: 10px;
+    background-color: #fdecea;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+}
 
 .form-error {
     color: #e74c3c;

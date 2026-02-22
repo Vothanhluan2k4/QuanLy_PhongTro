@@ -1,4 +1,4 @@
-﻿window.redirectToPayment = function (maHoaDon) {
+window.redirectToPayment = function (maHoaDon) {
     console.log('Redirecting to payment for MaHoaDon:', maHoaDon);
     window.location.href = `/PayBill/PayBill?maHoaDon=${encodeURIComponent(maHoaDon)}`;
 };
@@ -332,6 +332,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const email = document.getElementById('email').value.trim();
         const soDienThoai = document.getElementById('phone').value.trim();
 
+        // Xóa lỗi cũ (Data Annotations từ server)
+        const displayNameErrorEl = document.getElementById('displayNameError');
+        const profileEmailErrorEl = document.getElementById('profileEmailError');
+        const profilePhoneErrorEl = document.getElementById('profilePhoneError');
+        const summaryEl = document.getElementById('profile-validation-summary');
+        if (displayNameErrorEl) displayNameErrorEl.textContent = '';
+        if (profileEmailErrorEl) profileEmailErrorEl.textContent = '';
+        if (profilePhoneErrorEl) profilePhoneErrorEl.textContent = '';
+        if (summaryEl) { summaryEl.textContent = ''; summaryEl.style.display = 'none'; }
+
         try {
             const response = await fetch('/TrangCaNhan/UpdateProfile', {
                 method: 'POST',
@@ -350,10 +360,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 throw new Error(errorText || 'Lỗi khi gửi yêu cầu');
             }
 
-            const result = await response.json();                   
+            const result = await response.json();
             showToast(result.message, result.success ? 'success' : 'error');
 
+            // Hiển thị lỗi Data Annotations theo từng trường
+            if (!result.success && result.errors && typeof result.errors === 'object') {
+                if (result.errors.DisplayName && result.errors.DisplayName.length > 0 && displayNameErrorEl) {
+                    displayNameErrorEl.textContent = result.errors.DisplayName[0];
+                }
+                if (result.errors.Email && result.errors.Email.length > 0 && profileEmailErrorEl) {
+                    profileEmailErrorEl.textContent = result.errors.Email[0];
+                }
+                if (result.errors.Phone && result.errors.Phone.length > 0 && profilePhoneErrorEl) {
+                    profilePhoneErrorEl.textContent = result.errors.Phone[0];
+                }
+                if (summaryEl && result.message) {
+                    summaryEl.textContent = result.message;
+                    summaryEl.style.display = 'block';
+                    summaryEl.className = 'validation-summary text-danger';
+                }
+            }
+
             if (result.success) {
+                // Xóa lỗi hiển thị khi thành công
+                if (displayNameErrorEl) displayNameErrorEl.textContent = '';
+                if (profileEmailErrorEl) profileEmailErrorEl.textContent = '';
+                if (profilePhoneErrorEl) profilePhoneErrorEl.textContent = '';
+                if (summaryEl) { summaryEl.textContent = ''; summaryEl.style.display = 'none'; }
                 // Cập nhật tên trong layout
                 if (result.displayName) {
                     const userNameElement = document.querySelector('.user-name');

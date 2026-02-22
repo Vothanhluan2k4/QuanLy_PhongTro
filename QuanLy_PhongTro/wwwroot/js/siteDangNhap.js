@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     // Xử lý hiển thị/ẩn mật khẩu
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
@@ -114,7 +114,21 @@
                 }, 1000);
             } else {
                 showToast(result.message, 'error');
-                if (result.message.includes('Email')) {
+                // Hiển thị lỗi từ Data Annotations (server) theo từng trường
+                if (result.errors && typeof result.errors === 'object') {
+                    if (result.errors.Email && result.errors.Email.length > 0) {
+                        emailError.textContent = result.errors.Email[0];
+                        emailInput.classList.add('input-error');
+                    }
+                    if (result.errors.Password && result.errors.Password.length > 0) {
+                        passwordError.textContent = result.errors.Password[0];
+                        passwordInput.classList.add('input-error');
+                    }
+                    if (result.errors.Captcha && result.errors.Captcha.length > 0) {
+                        captchaError.textContent = result.errors.Captcha[0];
+                        if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+                    }
+                } else if (result.message.includes('Email')) {
                     emailError.textContent = result.message;
                     emailInput.classList.add('input-error');
                 } else if (result.message.includes('mật khẩu')) {
@@ -122,8 +136,7 @@
                     passwordInput.classList.add('input-error');
                 } else if (result.message.includes('captcha')) {
                     captchaError.textContent = 'Xác nhận CAPTCHA thất bại. Vui lòng thử lại.';
-                    grecaptcha.reset();
-                    console.log("CAPTCHA reset triggered. New token after reset:", grecaptcha.getResponse());
+                    if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
                 } else {
                     passwordError.textContent = result.message;
                     passwordInput.classList.add('input-error');

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -125,6 +125,8 @@
                     if (result.success) {
                         successMessage.textContent = result.message;
                         successMessage.style.display = 'block';
+                        passwordError.textContent = '';
+                        confirmPasswordError.textContent = '';
 
                         // Chuyển hướng sau 2 giây
                         setTimeout(() => {
@@ -133,6 +135,11 @@
                     } else {
                         errorMessage.textContent = result.message;
                         errorMessage.style.display = 'block';
+                        // Hiển thị lỗi Data Annotations theo trường (newPassword)
+                        if (result.errors && result.errors.newPassword && result.errors.newPassword.length > 0) {
+                            passwordError.textContent = result.errors.newPassword[0];
+                            newPasswordInput.classList.add('input-error');
+                        }
                     }
                 } catch (error) {
                     errorMessage.textContent = 'Lỗi kết nối đến máy chủ';

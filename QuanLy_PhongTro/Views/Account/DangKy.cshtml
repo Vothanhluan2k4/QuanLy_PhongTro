@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Đăng Ký Tài Khoản";
 }
 <!DOCTYPE html>
@@ -17,6 +17,7 @@
 
             <form id="registerForm" class="form-content">
                 @Html.AntiForgeryToken()
+                <div id="registerValidationSummary" class="validation-summary text-danger" style="display: none;" role="alert"></div>
                 <div class="form-group">
                     <label for="HoTen" class="form-label">Họ và Tên <span class="star_must">(*)</span></label>
                     <input type="text" id="HoTen" name="HoTen" class="form-input" placeholder="Nhập họ tên đầy đủ" required>
@@ -66,7 +67,9 @@
         document.getElementById('registerForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            // Xóa lỗi cũ
+            // Xóa lỗi cũ (Data Annotations từ server)
+            const summaryEl = document.getElementById('registerValidationSummary');
+            if (summaryEl) { summaryEl.textContent = ''; summaryEl.style.display = 'none'; }
             document.getElementById('hoTenError').textContent = '';
             document.getElementById('emailError').textContent = '';
             document.getElementById('sdtError').textContent = '';
@@ -102,16 +105,21 @@
                     alert(result.message);
                     window.location.href = '/DangNhap';
                 } else {
-                    alert(result.message); // Thông báo chung
+                    alert(result.message);
 
-                    // Hiển thị lỗi chi tiết từ đối tượng errors trả về
+                    // Hiển thị tóm tắt lỗi Data Annotations phía trên form
+                    const summaryEl = document.getElementById('registerValidationSummary');
+                    if (summaryEl) {
+                        summaryEl.textContent = result.message;
+                        summaryEl.style.display = 'block';
+                    }
+
+                    // Hiển thị lỗi chi tiết từ Data Annotations (result.errors) theo từng trường
                     if (result.errors) {
-                        console.log("Validation errors:", result.errors);
                         for (const fieldName in result.errors) {
                             const errorMessages = result.errors[fieldName];
                             if (errorMessages && errorMessages.length > 0) {
                                 let errorElementId = '';
-                                // Map tên trường từ ViewModel sang ID của thẻ span lỗi
                                 switch (fieldName) {
                                     case 'HoTen': errorElementId = 'hoTenError'; break;
                                     case 'Email': errorElementId = 'emailError'; break;
@@ -121,15 +129,14 @@
                                 }
                                 const errorElement = document.getElementById(errorElementId);
                                 if (errorElement) {
-                                    errorElement.textContent = errorMessages[0]; // Hiển thị lỗi đầu tiên
+                                    errorElement.textContent = errorMessages[0];
                                 }
                             }
                         }
+                    } else if (result.message.includes("Mật khẩu xác nhận")) {
+                        const confirmEl = document.getElementById('confirmPasswordError');
+                        if (confirmEl) confirmEl.textContent = result.message;
                     }
-                    // Dự phòng nếu không có errors object chi tiết
-                    else if (result.message.includes("Mật khẩu xác nhận")) {
-                        document.getElementById('confirmPasswordError').textContent = result.message;
-                    } // Thêm các else if khác nếu cần
                 }
             } catch (error) {
                 console.error('Error:', error);

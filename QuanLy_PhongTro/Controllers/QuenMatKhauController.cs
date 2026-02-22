@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using QuanLy_PhongTro.Models;
 using QuanLy_PhongTro.Repository;
 using QuanLy_PhongTro.Services;
@@ -149,6 +149,22 @@ namespace QuanLy_PhongTro.Controllers
         {
             try
             {
+                // Hiển thị lỗi Data Annotations (Required, MinLength, ...) lên frontend
+                if (model != null && !ModelState.IsValid)
+                {
+                    var errors = ModelState
+                        .Where(x => x.Value?.Errors?.Count > 0)
+                        .ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => (kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()) ?? Array.Empty<string>()
+                        );
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .FirstOrDefault() ?? "Dữ liệu không hợp lệ.";
+                    return Json(new { success = false, message = firstError, errors });
+                }
+
                 if (string.IsNullOrEmpty(model?.newPassword))
                 {
                     return Json(new { success = false, message = "Vui lòng nhập mật khẩu mới" });

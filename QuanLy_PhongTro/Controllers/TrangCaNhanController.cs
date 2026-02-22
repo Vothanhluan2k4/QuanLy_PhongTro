@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLy_PhongTro.Models;
 using QuanLy_PhongTro.Repository;
 using System.Security.Claims;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using QuanLy_PhongTro.ViewModel;
@@ -90,9 +91,26 @@ namespace QuanLy_PhongTro.Controllers
                     return Json(new { success = false, message = "Người dùng không tồn tại" });
                 }
 
+                // Hiển thị lỗi Data Annotations lên frontend
+                if (model != null && !ModelState.IsValid)
+                {
+                    var errors = ModelState
+                        .Where(x => x.Value?.Errors?.Count > 0)
+                        .ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => (kvp.Value?.Errors.Select(e => e.ErrorMessage).ToArray()) ?? Array.Empty<string>()
+                        );
+                    var firstError = ModelState.Values
+                        .SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage)
+                        .FirstOrDefault() ?? "Dữ liệu không hợp lệ.";
+                    return Json(new { success = false, message = firstError, errors });
+                }
+
                 bool hasChanges = false;
 
                 // Chuẩn hóa dữ liệu
+                model = model ?? new ProfileUpdateModel();
                 model.DisplayName = model.DisplayName?.Trim();
                 model.Email = model.Email?.Trim();
                 model.Phone = model.Phone?.Trim();

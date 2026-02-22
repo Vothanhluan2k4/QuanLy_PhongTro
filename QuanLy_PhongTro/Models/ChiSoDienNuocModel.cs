@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace QuanLy_PhongTro.Models
@@ -16,10 +16,12 @@ namespace QuanLy_PhongTro.Models
 
         public virtual HopDongModel HopDong { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Tháng không được để trống")]
+        [Range(1, 12, ErrorMessage = "Tháng phải từ 1 đến 12")]
         public int Thang { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Năm không được để trống")]
+        [Range(2000, 2100, ErrorMessage = "Năm không hợp lệ")]
         public int Nam { get; set; }
 
         [Required]

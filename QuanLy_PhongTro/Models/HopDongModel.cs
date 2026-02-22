@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace QuanLy_PhongTro.Models
@@ -35,9 +35,10 @@ namespace QuanLy_PhongTro.Models
         public DateTime NgayKy { get; set; } = DateTime.Now;
 
         [StringLength(2000, ErrorMessage = "Ghi chú không quá 2000 ký tự")]
-        public string GhiChu { get; set; }
+        public string? GhiChu { get; set; }
 
-        public string PhuongThucThanhToan { get; set; }
+        [StringLength(50, ErrorMessage = "Phương thức thanh toán không quá 50 ký tự")]
+        public string? PhuongThucThanhToan { get; set; }
 
         // Navigation properties
         public virtual PhongTroModel? PhongTro { get; set; }
